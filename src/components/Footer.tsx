@@ -23,7 +23,7 @@ export default function Footer() {
           <div className="relative w-72 h-36 md:w-80 md:h-40 flex justify-center md:justify-end">
             <Image
               src="/images/brand/12np-v.svg"
-              alt="Logo"
+              alt="12enpunto — Pastelería artesanal"
               fill
               className="object-contain object-center md:object-right brightness-0 invert"
             />

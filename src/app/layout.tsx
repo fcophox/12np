@@ -13,11 +13,61 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "12enpunto - Sabor y Dedicación",
-  description: "Tu lugar ideal para café, pastelería y mucho más, creado con amor.",
+  title: {
+    default: "12enpunto — Pastelería artesanal y café de especialidad",
+    template: "%s | 12enpunto",
+  },
+  description: "Pastelería artesanal, viennoiserie y café de especialidad en Chile. Pedidos personalizados para empresas y Pymes.",
+  keywords: ["pastelería artesanal", "café especialidad", "viennoiserie", "tortas", "macarons", "pastelería Chile", "12enpunto"],
+  authors: [{ name: "12enpunto" }],
+  creator: "12enpunto",
+  metadataBase: new URL("https://12enpunto.cl"),
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "es_CL",
+    url: "https://12enpunto.cl",
+    siteName: "12enpunto",
+    title: "12enpunto — Pastelería artesanal y café de especialidad",
+    description: "Pastelería artesanal, viennoiserie y café de especialidad en Chile. Pedidos personalizados para empresas y Pymes.",
+    images: [{ url: "/images/brand/background.png", width: 1200, height: 630, alt: "12enpunto — Pastelería artesanal" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "12enpunto — Pastelería artesanal y café de especialidad",
+    description: "Pastelería artesanal, viennoiserie y café de especialidad en Chile.",
+    images: ["/images/brand/background.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
   icons: {
     icon: "/favicon.svg",
   },
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Bakery",
+  name: "12enpunto",
+  url: "https://12enpunto.cl",
+  logo: "https://12enpunto.cl/images/brand/12np-v.svg",
+  image: "https://12enpunto.cl/images/brand/background.png",
+  description: "Pastelería artesanal, viennoiserie y café de especialidad en Santiago, Chile.",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Santiago",
+    addressCountry: "CL",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    email: "hola@12enpunto.cl",
+    availableLanguage: "Spanish",
+  },
+  sameAs: [],
 };
 
 export default function RootLayout({
@@ -31,6 +81,12 @@ export default function RootLayout({
       className={`${montserrat.variable} ${fraunces.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-[#fdfbf7]">
         {children}
       </body>

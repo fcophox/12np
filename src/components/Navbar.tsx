@@ -38,7 +38,7 @@ export default function Navbar() {
             <Link href="/" className="hidden md:block relative w-74 h-16">
               <Image
                 src="/images/brand/12np-h.svg"
-                alt="Logo"
+                alt="12enpunto — Pastelería artesanal"
                 fill
                 className="object-contain object-left pointer-events-none"
                 priority
@@ -49,7 +49,7 @@ export default function Navbar() {
             <Link href="/" className="md:hidden relative w-36 h-12">
               <Image
                 src="/images/brand/12np-h.svg"
-                alt="Logo"
+                alt="12enpunto — Pastelería artesanal"
                 fill
                 className="object-contain object-left transition-all duration-300"
                 priority

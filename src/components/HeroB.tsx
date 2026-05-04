@@ -41,7 +41,7 @@ export default function HeroB() {
           </BlurFadeIn>
 
           <BlurFadeIn delay={0.25}>
-            <h2 className="text-4xl md:text-[84px] leading-tight max-w-none font-[family-name:var(--font-fraunces)] font-bold mb-4">Pequeños momentos<br />a las 12 en punto.</h2>
+            <h1 className="text-4xl md:text-[84px] leading-tight max-w-none font-[family-name:var(--font-fraunces)] font-bold mb-4">Pequeños momentos<br />a las 12 en punto.</h1>
           </BlurFadeIn>
 
           <BlurFadeIn delay={0.4}>
