@@ -112,11 +112,23 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
 
     // 4. Calculate all new orders
     const updates = lista
-      .filter((item) => item.id !== 'temp')
-      .map((item, index) => ({
-        ...item,
-        orden: index + 1
-      }));
+      .map((item, index) => {
+        // We need to handle both Producto and ProductoDB types here
+        const base = {
+          id: item.id,
+          nombre: item.nombre,
+          frase: item.frase,
+          etiqueta: item.etiqueta,
+          etiquetas: item.etiquetas,
+          precio: item.precio,
+          destacado: item.destacado,
+          pausado: item.pausado,
+          imagen: item.imagen,
+          orden: index + 1
+        };
+        return base;
+      })
+      .filter((item) => item.id !== 'temp');
 
     // 5. Insert new product and update others
     const { error: insertError } = await supabase
@@ -151,7 +163,18 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
       .order("orden", { ascending: true });
     
     if (restantes) {
-      const updates = (restantes as ProductoDB[]).map((p, i) => ({ ...p, orden: i + 1 }));
+      const updates = (restantes as ProductoDB[]).map((p, i) => ({
+        id: p.id,
+        nombre: p.nombre,
+        frase: p.frase,
+        etiqueta: p.etiqueta,
+        etiquetas: p.etiquetas,
+        orden: i + 1,
+        precio: p.precio,
+        destacado: p.destacado,
+        pausado: p.pausado,
+        imagen: p.imagen
+      }));
       await supabase.from("productos").upsert(updates);
     }
     
