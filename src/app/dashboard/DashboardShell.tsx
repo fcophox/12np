@@ -268,11 +268,13 @@ function DashboardContent({
           </button>
         </div>
 
-        <ArticulosProvider>
-          <ProductosProvider>
-            {children}
-          </ProductosProvider>
-        </ArticulosProvider>
+        <div className="flex-1 w-full max-w-5xl mx-auto">
+          <ArticulosProvider>
+            <ProductosProvider>
+              {children}
+            </ProductosProvider>
+          </ArticulosProvider>
+        </div>
       </main>
 
       {/* Mobile bottom nav */}

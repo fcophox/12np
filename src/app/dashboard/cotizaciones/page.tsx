@@ -2,7 +2,7 @@ import { ClipboardList, Archive } from "lucide-react";
 
 export default function CotizacionesPage() {
   return (
-    <div className="p-5 md:p-10 max-w-5xl pb-36 md:pb-10">
+    <div className="p-5 md:p-10 pb-36 md:pb-10">
       {/* Header - Hidden on mobile as DashboardShell handles it */}
       <div className="flex items-start justify-between mb-8 md:mb-10 gap-4">
         <div className="hidden md:block">

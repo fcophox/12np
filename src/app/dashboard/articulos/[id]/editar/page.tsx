@@ -124,7 +124,7 @@ export default function EditarArticuloPage() {
   };
 
   if (!loaded) return (
-    <div className="p-10 max-w-5xl animate-pulse">
+    <div className="p-10 animate-pulse">
       <div className="h-6 w-48 bg-[#3d332e]/5 rounded-lg mb-6" />
       <div className="h-10 w-96 bg-[#3d332e]/5 rounded-lg mb-10" />
       <div className="flex gap-6">
@@ -142,7 +142,7 @@ export default function EditarArticuloPage() {
   );
 
   return (
-    <div className="p-5 md:p-10 max-w-6xl pb-36 md:pb-10">
+    <div className="p-5 md:p-10 pb-36 md:pb-10">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-xs md:text-sm text-[#3d332e]/40 mb-6">
         <Link href="/dashboard" className="hover:text-[#3d332e] transition-colors">Dashboard</Link>

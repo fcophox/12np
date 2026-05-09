@@ -245,7 +245,7 @@ export default function ArticulosPage() {
 
   if (loading) {
     return (
-      <div className="p-5 md:p-10 max-w-5xl animate-pulse">
+      <div className="p-5 md:p-10 animate-pulse">
         <div className="flex justify-between mb-10">
           <div className="space-y-3">
             <div className="h-10 w-48 bg-[#3d332e]/5 rounded-lg" />
@@ -269,7 +269,7 @@ export default function ArticulosPage() {
   );
 
   return (
-    <div className="p-5 md:p-10 max-w-5xl pb-36 md:pb-10">
+    <div className="p-5 md:p-10 pb-36 md:pb-10">
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4">
         <div className="hidden md:block">

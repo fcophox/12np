@@ -35,7 +35,7 @@ export default function DashboardPage() {
 
   if (brandLoading || loading) {
     return (
-      <div className="p-5 md:p-10 max-w-5xl animate-pulse">
+      <div className="p-5 md:p-10 animate-pulse">
         <div className="h-10 w-64 bg-[#3d332e]/5 rounded-lg mb-4" />
         <div className="h-4 w-96 bg-[#3d332e]/5 rounded-lg mb-10" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -96,7 +96,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="p-5 md:p-10 max-w-5xl pb-20 md:pb-10">
+    <div className="p-5 md:p-10 pb-20 md:pb-10">
       {/* Greeting - desktop only */}
       <div className="hidden md:block mb-10">
         <h1 className="text-4xl font-bold text-[#3d332e] mb-2">

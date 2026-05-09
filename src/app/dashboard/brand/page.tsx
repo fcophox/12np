@@ -52,7 +52,7 @@ export default function BrandPage() {
 
   if (loading) {
     return (
-      <div className="p-5 md:p-10 max-w-xl animate-pulse">
+      <div className="p-5 md:p-10 animate-pulse">
         <div className="h-10 w-48 bg-[#3d332e]/5 rounded-lg mb-8" />
         <div className="h-32 bg-white rounded-xl border border-[#e8e3dd] mb-6" />
         <div className="h-48 bg-white rounded-xl border border-[#e8e3dd]" />
@@ -61,7 +61,7 @@ export default function BrandPage() {
   }
 
   return (
-    <div className="p-5 md:p-10 max-w-xl pb-36 md:pb-10">
+    <div className="p-5 md:p-10 pb-36 md:pb-10">
       <div className="flex items-start justify-between mb-8 gap-4">
         <div className="hidden md:block">
           <h1 className="text-4xl font-bold text-[#3d332e] mb-2">Brand</h1>
