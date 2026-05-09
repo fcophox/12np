@@ -125,7 +125,7 @@ export default function CotizarClient() {
           empresa: formData.empresa,
           contacto: formData.contacto,
           email: formData.email,
-          tel: formData.tel,
+          tel: `+56 9 ${formData.tel}`,
           productos: {
             seleccionados: formData.productosSeleccionados,
             cantidades: formData.cantidades
@@ -403,14 +403,17 @@ export default function CotizarClient() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#3d332e]/40 ml-1">Teléfono</label>
-                      <input
-                        required
-                        name="tel"
-                        value={formData.tel}
-                        onChange={handleChange}
-                        placeholder="+56 9 ..."
-                        className="w-full px-4 py-3 bg-[#fdfbf7] border border-[#3d332e]/5 rounded-2xl focus:outline-none focus:border-[#f15a24] transition-colors"
-                      />
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-[#3d332e]/30 select-none">+56 9</span>
+                        <input
+                          required
+                          name="tel"
+                          value={formData.tel}
+                          onChange={handleChange}
+                          placeholder="1234 5678"
+                          className="w-full pl-16 pr-4 py-3 bg-[#fdfbf7] border border-[#3d332e]/5 rounded-2xl focus:outline-none focus:border-[#f15a24] transition-colors text-[#3d332e]"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-2">
