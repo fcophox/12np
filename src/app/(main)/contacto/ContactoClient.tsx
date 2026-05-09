@@ -50,6 +50,13 @@ export default function ContactoClient() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    if (name === "whatsapp") {
+      const numericValue = value.replace(/\D/g, "");
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -130,6 +137,8 @@ export default function ContactoClient() {
                               name="whatsapp"
                               value={formData.whatsapp}
                               onChange={handleChange}
+                              inputMode="numeric"
+                              maxLength={8}
                               placeholder="1234 5678"
                               className="w-full pl-20 pr-5 py-4 bg-[#fdfbf7] border border-[#3d332e]/5 rounded-2xl focus:outline-none focus:border-[#f15a24] transition-colors placeholder-[#3d332e]/20 text-[#3d332e]"
                             />

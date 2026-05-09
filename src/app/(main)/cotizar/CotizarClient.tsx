@@ -79,6 +79,13 @@ export default function CotizarClient() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
+    if (name === "tel") {
+      const numericValue = value.replace(/\D/g, "");
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -421,6 +428,8 @@ export default function CotizarClient() {
                           name="tel"
                           value={formData.tel}
                           onChange={handleChange}
+                          inputMode="numeric"
+                          maxLength={8}
                           placeholder="1234 5678"
                           className="w-full pl-16 pr-4 py-3 bg-[#fdfbf7] border border-[#3d332e]/5 rounded-2xl focus:outline-none focus:border-[#f15a24] transition-colors text-[#3d332e]"
                         />
