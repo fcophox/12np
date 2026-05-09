@@ -60,7 +60,7 @@ export default function HeroB() {
 
       <div className="relative w-full max-w-7xl mx-auto px-8 md:px-16 h-full flex flex-col md:flex-row items-start md:items-center pb-10 sm:pb-16 md:py-0 z-20 gap-8 md:gap-12">
         {/* Mobile Hero Image Slider */}
-        <div className="w-full aspect-[21/9] relative rounded-[2rem] overflow-hidden shadow-2xl md:hidden">
+        <div className="w-full aspect-[21/9] relative rounded-[2rem] overflow-hidden shadow-2xl md:hidden mt-4">
           {images.map((src, i) => (
             <Image
               key={src}
@@ -83,7 +83,7 @@ export default function HeroB() {
           </BlurFadeIn>
 
           <BlurFadeIn delay={0.25}>
-            <h1 className="text-4xl md:text-[84px] leading-none md:leading-tight max-w-none font-[family-name:var(--font-fraunces)] font-bold mb-4">Pequeños momentos<br />a las 12 en punto.</h1>
+            <h1 className="text-4xl md:text-[84px] leading-none md:leading-none max-w-none font-[family-name:var(--font-fraunces)] font-bold mb-4">Pequeños momentos<br />a las 12 en punto.</h1>
           </BlurFadeIn>
 
           <BlurFadeIn delay={0.4}>
@@ -107,7 +107,7 @@ export default function HeroB() {
 
       {/* Desktop-only masked image slider */}
       <div className="absolute top-0 right-0 h-full pointer-events-none z-10 hidden md:flex items-start justify-end">
-        <svg viewBox="0 0 1131 680" preserveAspectRatio="xMaxYMid meet" className="h-full w-auto block -mr-[450px]">
+        <svg viewBox="0 0 1131 680" preserveAspectRatio="xMaxYMid meet" className="h-full w-auto block -mr-[550px]">
           <defs>
             <clipPath id="heroMask" clipPathUnits="userSpaceOnUse">
               <path d="M1131 680H13.1621C4.6662 658.311 0 634.701 0 610C0 503.961 85.9613 418 192 418C198.547 418 205.017 418.328 211.395 418.968C211.132 413.011 211 407.021 211 401C211 179.534 390.534 0 612 0H1131V680Z" />

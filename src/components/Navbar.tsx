@@ -29,13 +29,13 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 px-8 py-4 md:py-6 md:px-16 w-full bg-[#fdfbf7]/80 backdrop-blur-lg border-b border-[#3d332e]/5">
+      <nav className="sticky top-0 z-50 px-8 py-4 min-[990px]:py-6 min-[990px]:px-16 w-full bg-[#fdfbf7]/80 backdrop-blur-lg border-b border-[#3d332e]/5">
         <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
 
           {/* Mobile: Hamburger (Left) | Desktop: Logo (Left) */}
           <div className="flex-1 flex justify-start items-center">
             {/* Desktop Logo */}
-            <Link href="/" className="hidden md:block relative w-74 h-16">
+            <Link href="/" className="hidden min-[990px]:block relative w-74 h-16">
               <Image
                 src="/images/brand/12np-h.svg"
                 alt="12enpunto — Pastelería artesanal"
@@ -46,7 +46,7 @@ export default function Navbar() {
             </Link>
 
             {/* Mobile Logo (left) */}
-            <Link href="/" className="md:hidden relative w-36 h-12">
+            <Link href="/" className="min-[990px]:hidden relative w-36 h-12">
               <Image
                 src="/images/brand/12np-h.svg"
                 alt="12enpunto — Pastelería artesanal"
@@ -65,7 +65,7 @@ export default function Navbar() {
           {/* Mobile: Button (Right) | Desktop: Button (Right) */}
           <div className="flex-1 flex justify-end items-center">
             {/* Desktop Menu (right-aligned) */}
-            <div className="hidden md:flex items-center justify-end gap-8 text-sm font-medium text-[#3d332e]">
+            <div className="hidden min-[990px]:flex items-center justify-end gap-8 text-sm font-medium text-[#3d332e]">
               <Link href="/" className="hover:text-[#f15a24] transition-colors whitespace-nowrap">Inicio</Link>
               <Link href="/la-carta" className="hover:text-[#f15a24] transition-colors whitespace-nowrap">La carta</Link>
               <Link href="/la-pastelera" className="hover:text-[#f15a24] transition-colors whitespace-nowrap">La pastelera</Link>
@@ -80,7 +80,7 @@ export default function Navbar() {
             {/* Mobile Hamburger (right) */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`md:hidden p-2 ml-3 transition-colors z-50 ${isMenuOpen ? 'text-white' : 'text-black'}`}
+              className={`min-[990px]:hidden p-2 ml-3 transition-colors z-50 ${isMenuOpen ? 'text-white' : 'text-black'}`}
               aria-label="Abrir menú"
             >
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
