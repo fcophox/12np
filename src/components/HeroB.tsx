@@ -43,7 +43,7 @@ export default function HeroB() {
   }, []);
 
   return (
-    <section className="relative w-full min-h-[80vh] md:h-[80vh] overflow-hidden flex flex-col">
+    <section className="relative w-full min-h-[80vh] min-[990px]:max-[1200px]:h-[600px] min-[1201px]:h-[80vh] overflow-hidden flex flex-col">
       <Image
         src="/images/brand/background.png"
         alt="Hero B Background"
