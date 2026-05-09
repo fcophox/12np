@@ -302,18 +302,9 @@ function DashboardContent({
                 />
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl border border-[#e8e3dd] shadow-xl z-50 overflow-hidden animate-fade-in-up [animation-duration:200ms]">
                   <Link 
-                    href="https://12enpunto.com/cotizar" 
-                    target="_blank"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#3d332e] hover:bg-[#f9f4e8] transition-colors"
-                  >
-                    <ClipboardList size={16} className="text-[#f15a24]" />
-                    <span>Cotizar</span>
-                  </Link>
-                  <Link 
                     href="/dashboard/cotizaciones" 
                     onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#3d332e] hover:bg-[#f9f4e8] transition-colors border-t border-[#f5f5f5]"
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#3d332e] hover:bg-[#f9f4e8] transition-colors"
                   >
                     <ClipboardList size={16} className="text-[#3d332e]/40" />
                     <span>Cotizaciones</span>
