@@ -225,7 +225,7 @@ export default function GaleriaPage() {
       {/* Header */}
       <div className="hidden md:block">
         <h1 className="text-4xl font-bold text-[#3d332e] mb-2 font-[family-name:var(--font-fraunces)]">
-          Galería Multicategoría
+          Galería multicategoría
         </h1>
         <p className="text-[#3d332e]/60 text-base">
           Organiza y actualiza las imágenes dinámicas de todo el sitio web.

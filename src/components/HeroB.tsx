@@ -106,8 +106,8 @@ export default function HeroB() {
       </div>
 
       {/* Desktop-only masked image slider */}
-      <div className="absolute top-0 right-0 h-full pointer-events-none z-10 hidden md:flex items-start justify-end ">
-        <svg viewBox="0 0 1131 680" preserveAspectRatio="xMaxYMid meet" className="h-full w-auto block -mr-80">
+      <div className="absolute top-0 right-0 h-full pointer-events-none z-10 hidden md:flex items-start justify-end">
+        <svg viewBox="0 0 1131 680" preserveAspectRatio="xMaxYMid meet" className="h-full w-auto block -mr-[450px]">
           <defs>
             <clipPath id="heroMask" clipPathUnits="userSpaceOnUse">
               <path d="M1131 680H13.1621C4.6662 658.311 0 634.701 0 610C0 503.961 85.9613 418 192 418C198.547 418 205.017 418.328 211.395 418.968C211.132 413.011 211 407.021 211 401C211 179.534 390.534 0 612 0H1131V680Z" />
