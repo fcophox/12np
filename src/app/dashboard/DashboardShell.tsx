@@ -140,9 +140,9 @@ function DashboardContent({
         {/* Brand header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-[#e8e3dd]">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-md bg-[#f9f4e8] flex items-center justify-center shrink-0 overflow-hidden p-1.5">
+            <Link href="/dashboard" className="w-8 h-8 rounded-md bg-[#f9f4e8] flex items-center justify-center shrink-0 overflow-hidden p-1.5 hover:bg-[#f15a24]/10 transition-colors">
               <Image src="/images/brand/12np-v.svg" alt="12np" width={24} height={24} style={{ height: 'auto' }} />
-            </div>
+            </Link>
             {!collapsed && (
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[#3d332e] leading-tight truncate">{displayName}</p>
@@ -257,9 +257,9 @@ function DashboardContent({
         <div className="md:hidden sticky top-0 z-30 bg-white border-b border-[#e8e3dd] flex items-center justify-between px-4 h-14 shrink-0">
           {/* Left: back button or logo */}
           {isRoot ? (
-            <div className="w-8 h-8 rounded-md bg-[#f9f4e8] flex items-center justify-center overflow-hidden p-1.5">
+            <Link href="/dashboard" className="w-8 h-8 rounded-md bg-[#f9f4e8] flex items-center justify-center overflow-hidden p-1.5 hover:bg-[#f15a24]/10 transition-colors">
               <Image src="/images/brand/12np-v.svg" alt="12np" width={20} height={20} style={{ height: 'auto' }} />
-            </div>
+            </Link>
           ) : (
             <button
               onClick={() => router.back()}
