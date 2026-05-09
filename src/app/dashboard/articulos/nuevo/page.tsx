@@ -5,7 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, ImagePlus, Save, Upload } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
-import { useArticulos } from "@/context/ArticulosContext";
+import { useArticulos, Articulo } from "@/context/ArticulosContext";
 import { useBrand } from "@/context/BrandContext";
 import { toast } from "sonner";
 
