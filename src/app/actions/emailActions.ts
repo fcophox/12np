@@ -19,9 +19,9 @@ export async function sendContactEmail(formData: {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: '12enpunto <onboarding@resend.dev>',
+      from: '12enpunto <hola@12enpunto.cl>',
       to: ['somos12enpunto@gmail.com'],
-      subject: `Nuevo mensaje de contacto: ${formData.nombre}`,
+      subject: `Nuevo mensaje de Contacto: ${formData.nombre}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
           <h2 style="color: #f15a24; font-size: 32px; margin-bottom: 10px;">Nuevo mensaje desde la Web</h2>
@@ -77,7 +77,7 @@ export async function sendQuotationEmail(formData: {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: '12enpunto <onboarding@resend.dev>',
+      from: '12enpunto <hola@12enpunto.cl>',
       to: ['somos12enpunto@gmail.com'],
       subject: `Nueva Solicitud de Cotización: ${formData.empresa}`,
       html: `
