@@ -24,19 +24,21 @@ export async function sendContactEmail(formData: {
       subject: `Nuevo mensaje de contacto: ${formData.nombre}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-          <h2 style="color: #f15a24;">Nuevo mensaje de contacto</h2>
-          <p>Has recibido un nuevo mensaje desde el sitio web de 12enpunto.</p>
+          <h2 style="color: #f15a24; font-size: 32px; margin-bottom: 10px;">Nuevo mensaje desde la Web</h2>
+          <p style="color: #666;">Has recibido un nuevo mensaje desde el sitio web de 12enpunto.</p>
           
-          <div style="background: #f9f4e8; padding: 20px; border-radius: 10px; margin-top: 20px;">
-            <p><strong>Nombre:</strong> ${formData.nombre}</p>
-            <p><strong>Email:</strong> ${formData.email}</p>
-            <p><strong>WhatsApp:</strong> ${formData.whatsapp}</p>
-            <p style="margin-top: 20px;"><strong>Mensaje:</strong></p>
-            <p style="white-space: pre-wrap;">${formData.mensaje}</p>
+          <div style="background: #f9f4e8; padding: 25px; border-radius: 15px; border: 1px solid #f15a24; margin-top: 25px;">
+            <h3 style="margin-top: 0; color: #3d332e; border-bottom: 1px solid #f15a2420; padding-bottom: 10px;">Datos del Contacto</h3>
+            <p style="margin: 10px 0;"><strong>Nombre:</strong> ${formData.nombre}</p>
+            <p style="margin: 10px 0;"><strong>Email:</strong> ${formData.email}</p>
+            <p style="margin: 10px 0;"><strong>WhatsApp:</strong> ${formData.whatsapp}</p>
+            
+            <h3 style="margin-top: 20px; color: #3d332e;">Mensaje:</h3>
+            <p style="background: #ffffff; padding: 15px; border-radius: 10px; white-space: pre-wrap; color: #3d332e; border: 1px solid #eee;">${formData.mensaje}</p>
           </div>
           
-          <p style="font-size: 12px; color: #999; margin-top: 30px;">
-            Este es un mensaje automático enviado desde el formulario de contacto.
+          <p style="font-size: 11px; color: #999; margin-top: 40px; text-align: center; border-top: 1px solid #eee; pt-20">
+            Este es un mensaje automático enviado desde el formulario de contacto de 12enpunto.
           </p>
         </div>
       `,
@@ -80,33 +82,40 @@ export async function sendQuotationEmail(formData: {
       subject: `Nueva Solicitud de Cotización: ${formData.empresa}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-          <h2 style="color: #74865e;">Nueva Solicitud de Cotización (B2B)</h2>
-          <p>Has recibido una nueva solicitud de cotización desde el sitio web.</p>
+          <h2 style="color: #74865e; font-size: 32px; margin-bottom: 10px;">Nueva Solicitud B2B</h2>
+          <p style="color: #666;">Has recibido una nueva solicitud de cotización desde el sitio web.</p>
           
-          <div style="background: #fdfbf7; padding: 20px; border-radius: 10px; border: 1px solid #74865e; margin-top: 20px;">
-            <h3 style="margin-top: 0;">Datos de la Empresa</h3>
-            <p><strong>Empresa:</strong> ${formData.empresa}</p>
-            <p><strong>Contacto:</strong> ${formData.contacto}</p>
-            <p><strong>Email:</strong> ${formData.email}</p>
-            <p><strong>Teléfono:</strong> ${formData.tel}</p>
+          <div style="background: #fdfbf7; padding: 25px; border-radius: 15px; border: 1px solid #74865e; margin-top: 25px;">
+            <h3 style="margin-top: 0; color: #3d332e; border-bottom: 1px solid #74865e20; padding-bottom: 10px;">Datos de la Empresa</h3>
+            <p style="margin: 10px 0;"><strong>Empresa:</strong> ${formData.empresa}</p>
+            <p style="margin: 10px 0;"><strong>Contacto:</strong> ${formData.contacto}</p>
+            <p style="margin: 10px 0;"><strong>Email:</strong> ${formData.email}</p>
+            <p style="margin: 10px 0;"><strong>Teléfono:</strong> ${formData.tel}</p>
           </div>
 
-          <div style="margin-top: 20px;">
-            <h3>Productos Solicitados</h3>
-            <ul>
-              ${formData.productos.seleccionados.map(id => `<li><strong>${id}:</strong> ${formData.productos.cantidades[id] || 0} unidades</li>`).join('')}
-            </ul>
+          <div style="margin-top: 25px;">
+            <h3 style="color: #3d332e;">Productos Solicitados</h3>
+            <div style="background: #ffffff; border: 1px solid #eee; border-radius: 10px; padding: 15px;">
+              <ul style="list-style: none; padding: 0; margin: 0;">
+                ${formData.productos.seleccionados.map(id => `
+                  <li style="padding: 8px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between;">
+                    <span style="font-weight: bold; color: #3d332e;">${id}</span>
+                    <span style="color: #74865e;">${formData.productos.cantidades[id] || 0} unidades</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
           </div>
           
           ${formData.detalleAdicional ? `
-          <div style="margin-top: 20px;">
-            <h3>Detalle Adicional / Tiempos</h3>
-            <p style="white-space: pre-wrap;">${formData.detalleAdicional}</p>
+          <div style="margin-top: 25px;">
+            <h3 style="color: #3d332e;">Detalle Adicional / Tiempos</h3>
+            <p style="background: #f9f9f9; padding: 15px; border-radius: 10px; white-space: pre-wrap; color: #555;">${formData.detalleAdicional}</p>
           </div>
           ` : ''}
           
-          <p style="font-size: 12px; color: #999; margin-top: 30px;">
-            Este es un mensaje automático enviado desde el formulario de cotización.
+          <p style="font-size: 11px; color: #999; margin-top: 40px; text-align: center; border-top: 1px solid #eee; pt-20">
+            Este es un mensaje automático enviado desde el sistema de cotizaciones de 12enpunto.
           </p>
         </div>
       `,
