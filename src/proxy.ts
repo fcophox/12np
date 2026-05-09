@@ -2,14 +2,21 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 import { createServerClient } from '@supabase/ssr'
 
-export default async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // 1. Primero ejecutamos la actualización de sesión (necesario para Supabase)
   const supabaseResponse = await updateSession(request)
   
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key) {
+    return supabaseResponse
+  }
+
   // 2. Creamos un cliente de Supabase para verificar al usuario actual
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    key,
     {
       cookies: {
         getAll() {
