@@ -313,6 +313,7 @@ export default function ContactoPage() {
                 onClick={() => setSelectedContacto(c)}
               />
             ))}
+          </div>
         </div>
       )}
 
