@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronLeft, CheckCircle2, Building2, Package, Send, Cookie, ClipboardList, Pencil } from "lucide-react";
+import { ChevronRight, ChevronLeft, CheckCircle2, Building2, Package, Send, Cookie, ClipboardList, Pencil, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 const FALLBACK_PRODUCTS = [
   {
@@ -110,9 +111,41 @@ export default function CotizarClient() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTimeout(() => setIsSubmitted(true), 1500);
+    setIsSubmitting(true);
+    
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("cotizaciones")
+        .insert([{
+          empresa: formData.empresa,
+          contacto: formData.contacto,
+          email: formData.email,
+          tel: formData.tel,
+          productos: {
+            seleccionados: formData.productosSeleccionados,
+            cantidades: formData.cantidades
+          },
+          detalle_adicional: formData.productosPersonalizados,
+          leido: false
+        }]);
+
+      if (error) throw error;
+      
+      setIsSubmitted(true);
+      toast.success("Solicitud enviada correctamente");
+    } catch (error: any) {
+      console.error("Error sending quotation:", error);
+      toast.error("Error al enviar la solicitud", {
+        description: "Por favor intenta nuevamente o contáctanos por WhatsApp."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const steps = [
@@ -506,10 +539,20 @@ export default function CotizarClient() {
                 ) : (
                   <button
                     type="submit"
-                    className="flex-[2] py-3.5 bg-[#74865e] text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-xs hover:bg-[#3d332e] transition-all flex items-center justify-center gap-3 shadow-xl shadow-[#74865e]/20"
+                    disabled={isSubmitting}
+                    className="flex-[2] py-3.5 bg-[#74865e] text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-xs hover:bg-[#3d332e] transition-all flex items-center justify-center gap-3 shadow-xl shadow-[#74865e]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Enviar Solicitud
-                    <Send size={18} />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        Enviando...
+                      </>
+                    ) : (
+                      <>
+                        Enviar Solicitud
+                        <Send size={18} />
+                      </>
+                    )}
                   </button>
                 )}
               </div>
