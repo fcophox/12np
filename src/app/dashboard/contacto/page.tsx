@@ -264,7 +264,7 @@ export default function ContactoPage() {
       <div className="flex items-start justify-between mb-8 md:mb-10 gap-4">
         <div className="hidden md:block">
           <h1 className="text-xl font-bold text-[#3d332e] mb-2">
-            Mensajes de Contacto
+            Mensajes de contacto
           </h1>
           <p className="text-[#3d332e]/60 text-base">
             Gestiona las consultas y mensajes recibidos desde el sitio web.
