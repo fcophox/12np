@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { ArticulosProvider } from "@/context/ArticulosContext";
 import { ProductosProvider } from "@/context/ProductosContext";
+import { ContactosProvider } from "@/context/ContactosContext";
 import { BrandProvider, useBrand } from "@/context/BrandContext";
 import { logout } from "@/app/login/actions";
 
@@ -271,7 +272,9 @@ function DashboardContent({
         <div className="flex-1 w-full max-w-5xl mx-auto">
           <ArticulosProvider>
             <ProductosProvider>
-              {children}
+              <ContactosProvider>
+                {children}
+              </ContactosProvider>
             </ProductosProvider>
           </ArticulosProvider>
         </div>

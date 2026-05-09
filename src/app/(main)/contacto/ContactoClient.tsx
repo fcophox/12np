@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, ChevronRight, Phone } from "lucide-react";
+import { CheckCircle2, ChevronRight, Phone, Loader2 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 import B2BBanner from "@/components/B2BBanner";
+import { toast } from "sonner";
 
 export default function ContactoClient() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -14,12 +16,36 @@ export default function ContactoClient() {
     mensaje: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    setTimeout(() => {
+    setIsSubmitting(true);
+    
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("contactos")
+        .insert([{
+          nombre: formData.nombre,
+          email: formData.email,
+          whatsapp: formData.whatsapp,
+          mensaje: formData.mensaje,
+          leido: false
+        }]);
+
+      if (error) throw error;
+      
       setIsSubmitted(true);
-    }, 1000);
+      toast.success("Mensaje enviado correctamente");
+    } catch (error: any) {
+      console.error("Error sending contact form:", error);
+      toast.error("Error al enviar el mensaje", {
+        description: "Por favor intenta nuevamente o contáctanos por WhatsApp."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -125,10 +151,20 @@ export default function ContactoClient() {
 
                         <button
                         type="submit"
-                        className="w-full py-5 bg-[#3d332e] text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-xs hover:bg-[#f15a24] transition-all duration-300 flex items-center justify-center gap-3 group"
+                        disabled={isSubmitting}
+                        className="w-full py-5 bg-[#3d332e] text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-xs hover:bg-[#f15a24] transition-all duration-300 flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Enviar Mensaje
-                        <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 size={18} className="animate-spin" />
+                            Enviando...
+                          </>
+                        ) : (
+                          <>
+                            Enviar Mensaje
+                            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                          </>
+                        )}
                       </button>
                       </div>
                     </motion.form>
