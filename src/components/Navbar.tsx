@@ -1,6 +1,6 @@
 "use client";
 
-import AppImage from "@/components/ui/AppImage";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useTransition } from "react";
 import { Menu, X, ArrowUpRight } from "lucide-react";
@@ -35,22 +35,22 @@ export default function Navbar() {
           {/* Mobile: Hamburger (Left) | Desktop: Logo (Left) */}
           <div className="flex-1 flex justify-start items-center">
             {/* Desktop Logo */}
-            <Link href="/" className="hidden md:block w-74 h-16">
-              <AppImage
+            <Link href="/" className="hidden md:block relative w-74 h-16">
+              <Image
                 src="/images/brand/12np-h.svg"
                 alt="12enpunto — Pastelería artesanal"
-                variant="fill"
+                fill
                 className="object-contain object-left pointer-events-none"
                 priority
               />
             </Link>
 
             {/* Mobile Logo (left) */}
-            <Link href="/" className="md:hidden w-36 h-12">
-              <AppImage
+            <Link href="/" className="md:hidden relative w-36 h-12">
+              <Image
                 src="/images/brand/12np-h.svg"
                 alt="12enpunto — Pastelería artesanal"
-                variant="fill"
+                fill
                 className="object-contain object-left transition-all duration-300"
                 priority
               />

@@ -1,4 +1,4 @@
-import AppImage from "@/components/ui/AppImage";
+import Image from "next/image";
 import { Clock, Sparkles, UtensilsCrossed } from "lucide-react";
 
 export default function ComingSoonPage() {
@@ -10,10 +10,10 @@ export default function ComingSoonPage() {
         <div className="space-y-6 flex flex-col items-center">
           <div className="relative w-48 h-48 md:w-64 md:h-64 opacity-80">
             {/* Using a placeholder for the Shiba logo, user can replace this with their SVG/PNG */}
-            <AppImage
+            <Image
               src="/images/brand/12np-v.svg"
               alt="Logo"
-              variant="fill"
+              fill
               className="object-contain"
             />
           </div>

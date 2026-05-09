@@ -1,17 +1,17 @@
-import AppImage from "@/components/ui/AppImage";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 
 export default function NotFound() {
   return (
     <div className="min-h-[80vh] w-full flex flex-col items-center justify-center px-8 py-20 text-center">
       <div className="mb-12">
-        <AppImage
+        <Image
           src="/images/brand/12np-v.svg"
           alt="12enpunto Logo"
           width={192}
           height={96}
-          variant="responsive"
+          style={{ height: 'auto' }}
           priority
         />
       </div>

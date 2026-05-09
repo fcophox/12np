@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
-import AppImage from "@/components/ui/AppImage";
+import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import Certificacion from "@/components/Certificacion";
 import PasteleraFeatures from "@/components/PasteleraFeatures";
@@ -101,10 +101,10 @@ export default function LaPasteleraClient() {
           {/* Left: Imagen cuadrada */}
           <BlurFadeIn className="w-full md:w-1/2">
             <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl shadow-black/10">
-              <AppImage
+              <Image
                 src="/images/team/bettypanchita.jpg"
                 alt="Betty y la pastelera"
-                variant="fill"
+                fill
                 className="object-cover"
                 priority
               />
@@ -128,10 +128,10 @@ export default function LaPasteleraClient() {
               </p>
               <div className="flex items-center gap-4">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-orange-100 shadow-sm shrink-0">
-                  <AppImage
+                  <Image
                     src={author?.avatar_url || "/images/team/francisca.png"}
                     alt={author?.full_name || "Francisca"}
-                    variant="fill"
+                    fill
                     className="object-cover"
                   />
                 </div>
@@ -166,7 +166,7 @@ export default function LaPasteleraClient() {
             {GALLERY_IMAGES.map((img, i) => (
               <BlurFadeIn key={i} delay={(i % 3) * 0.1} yOffset={16}>
                 <div className="break-inside-avoid group relative rounded-[2rem] overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
-                  <AppImage src={img.src} alt={img.alt} width={img.w} height={img.h} variant="responsive" className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <Image src={img.src} alt={img.alt} width={img.w} height={img.h} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110" />
                 </div>
               </BlurFadeIn>
             ))}
@@ -177,7 +177,7 @@ export default function LaPasteleraClient() {
             <div ref={trackRef} className="flex gap-6 items-center w-max px-[10vw]">
               {[...GALLERY_IMAGES, ...GALLERY_IMAGES].map((img, i) => (
                 <div key={i} className="flex-shrink-0 w-[280px] h-[280px] relative rounded-[2.5rem] overflow-hidden shadow-lg">
-                  <AppImage src={img.src} alt={img.alt} variant="fill" className="object-cover" />
+                  <Image src={img.src} alt={img.alt} fill className="object-cover" />
                 </div>
               ))}
             </div>

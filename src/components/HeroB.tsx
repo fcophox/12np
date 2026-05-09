@@ -1,6 +1,6 @@
 "use client";
 
-import AppImage from "@/components/ui/AppImage";
+import Image from "next/image";
 import Link from "next/link";
 import BlurFadeIn from "./BlurFadeIn";
 import { useEffect, useState } from "react";
@@ -25,10 +25,10 @@ export default function HeroB() {
 
   return (
     <section className="relative w-full min-h-[80vh] md:h-[80vh] overflow-hidden flex flex-col">
-      <AppImage
+      <Image
         src="/images/brand/background.png"
         alt="Hero B Background"
-        variant="fill"
+        fill
         sizes="100vw"
         className="object-cover"
         priority
@@ -43,11 +43,11 @@ export default function HeroB() {
         {/* Mobile Hero Image Slider */}
         <div className="w-full aspect-[21/9] relative rounded-[2rem] overflow-hidden shadow-2xl md:hidden">
           {SLIDER_IMAGES.map((src, i) => (
-            <AppImage
+            <Image
               key={src}
               src={src}
               alt={`Hero Image ${i + 1}`}
-              variant="fill"
+              fill
               sizes="100vw"
               className={`object-cover transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
               priority={i === 0}

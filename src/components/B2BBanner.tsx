@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import AppImage from "@/components/ui/AppImage";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
@@ -9,10 +9,10 @@ export default function B2BBanner() {
   return (
     <section className="w-full bg-[#3d332e] py-24 md:py-32 relative overflow-hidden text-center">
       {/* Background image with low opacity */}
-      <AppImage
+      <Image
         src="/images/brand/background.png"
         alt=""
-        variant="fill"
+        fill
         className="object-cover opacity-5 brightness-50 pointer-events-none select-none"
       />
 

@@ -1,4 +1,4 @@
-import AppImage from "@/components/ui/AppImage";
+import Image from "next/image";
 import { Clock, Sparkles, UtensilsCrossed } from "lucide-react";
 
 export default function ComingSoon() {
@@ -9,12 +9,12 @@ export default function ComingSoon() {
         {/* Logo Section */}
         <div className="space-y-4 flex flex-col items-center">
           <div className="animate-fade-in">
-            <AppImage
+            <Image
               src="/images/brand/12np-v.svg"
               alt="12enpunto Logo"
               width={224}
               height={224}
-              variant="responsive"
+              style={{ height: 'auto' }}
               priority
             />
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import AppImage from "@/components/ui/AppImage";
+import Image from "next/image";
 import { Lightbulb, Palette, Handshake, Leaf } from "lucide-react";
 import BlurFadeIn from "./BlurFadeIn";
 
@@ -27,10 +27,10 @@ export default function Certificacion() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left: Large Image */}
           <BlurFadeIn delay={0.1} className="lg:col-span-4 relative aspect-[4/5] lg:aspect-auto rounded-[3rem] overflow-hidden shadow-2xl shadow-black/5">
-            <AppImage
+            <Image
               src="/images/team/chita.jpg"
               alt="Proceso de Certificación"
-              variant="fill"
+              fill
               className="object-cover"
             />
           </BlurFadeIn>

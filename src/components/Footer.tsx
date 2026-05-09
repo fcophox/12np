@@ -1,4 +1,4 @@
-import AppImage from "@/components/ui/AppImage";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
@@ -21,13 +21,13 @@ export default function Footer() {
             </Link>
           </div>
           <div className="flex justify-center md:justify-end">
-            <AppImage
+            <Image
               src="/images/brand/12np-v.svg"
               alt="12enpunto — Pastelería artesanal"
               width={320}
               height={160}
-              variant="responsive"
-              className="brightness-0 invert max-w-full"
+              className="brightness-0 invert"
+              style={{ height: 'auto', width: 'auto', maxWidth: '100%' }}
             />
           </div>
         </div>
