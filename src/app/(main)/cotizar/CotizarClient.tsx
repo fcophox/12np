@@ -163,15 +163,21 @@ export default function CotizarClient() {
 
       // Enviar copia por correo
       try {
+        // Mapear los IDs a nombres para el correo
+        const productosConNombres = formData.productosSeleccionados.map(id => {
+          const p = products.find(prod => prod.id === id);
+          return {
+            nombre: p ? p.nombre : "Producto desconocido",
+            cantidad: formData.cantidades[id] || "0"
+          };
+        });
+
         await sendQuotationEmail({
           empresa: formData.empresa,
           contacto: formData.contacto,
           email: formData.email,
           tel: `+56 9 ${formData.tel}`,
-          productos: {
-            seleccionados: formData.productosSeleccionados,
-            cantidades: formData.cantidades
-          },
+          productos: productosConNombres,
           detalleAdicional: formData.productosPersonalizados
         });
       } catch (emailErr) {

@@ -63,9 +63,9 @@ export async function sendQuotationEmail(formData: {
   email: string;
   tel: string;
   productos: {
-    seleccionados: string[];
-    cantidades: Record<string, string>;
-  };
+    nombre: string;
+    cantidad: string;
+  }[];
   detalleAdicional: string;
 }) {
   console.log("Iniciando envío de correo de cotización...");
@@ -97,10 +97,12 @@ export async function sendQuotationEmail(formData: {
             <h3 style="color: #3d332e;">Productos Solicitados</h3>
             <div style="background: #ffffff; border: 1px solid #eee; border-radius: 10px; padding: 15px;">
               <ul style="list-style: none; padding: 0; margin: 0;">
-                ${formData.productos.seleccionados.map(id => `
-                  <li style="padding: 8px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between;">
-                    <span style="font-weight: bold; color: #3d332e;">${id}</span>
-                    <span style="color: #74865e;">${formData.productos.cantidades[id] || 0} unidades</span>
+                ${formData.productos.map(p => `
+                  <li style="padding: 10px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: bold; color: #3d332e; font-size: 14px;">${p.nombre}</span>
+                    <span style="background: #74865e10; color: #74865e; padding: 4px 12px; rounded-full; font-weight: bold; font-size: 12px; border-radius: 20px;">
+                      ${p.cantidad} unidades
+                    </span>
                   </li>
                 `).join('')}
               </ul>
@@ -110,11 +112,11 @@ export async function sendQuotationEmail(formData: {
           ${formData.detalleAdicional ? `
           <div style="margin-top: 25px;">
             <h3 style="color: #3d332e;">Detalle Adicional / Tiempos</h3>
-            <p style="background: #f9f9f9; padding: 15px; border-radius: 10px; white-space: pre-wrap; color: #555;">${formData.detalleAdicional}</p>
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; white-space: pre-wrap; color: #555; font-size: 14px; line-height: 1.5;">${formData.detalleAdicional}</div>
           </div>
           ` : ''}
           
-          <p style="font-size: 11px; color: #999; margin-top: 40px; text-align: center; border-top: 1px solid #eee; pt-20">
+          <p style="font-size: 11px; color: #999; margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
             Este es un mensaje automático enviado desde el sistema de cotizaciones de 12enpunto.
           </p>
         </div>
