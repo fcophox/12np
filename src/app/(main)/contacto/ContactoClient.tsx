@@ -214,7 +214,7 @@ export default function ContactoClient() {
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             {/* WhatsApp */}
-            <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 group p-6 rounded-2xl border-2 border-[#74865e]/20 bg-[#74865e]/5 hover:border-[#74865e]/60 hover:bg-[#74865e]/10 transition-all duration-300">
+            <a href="https://wa.me/56984172836" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 group p-6 rounded-2xl border-2 border-[#74865e]/20 bg-[#74865e]/5 hover:border-[#74865e]/60 hover:bg-[#74865e]/10 transition-all duration-300">
               <div className="w-12 h-12 rounded-full bg-[#74865e] flex items-center justify-center text-white shadow-lg shadow-[#74865e]/20 group-hover:scale-110 transition-transform duration-300 shrink-0">
                 <Phone size={20} />
               </div>
