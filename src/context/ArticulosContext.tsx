@@ -20,6 +20,23 @@ export interface Articulo {
   creadoEn: string;
 }
 
+interface ArticuloDB {
+  id: string;
+  titulo: string;
+  slug: string;
+  descripcion: string;
+  contenido: string;
+  estado: string;
+  categoria: string;
+  etiquetas: string;
+  autor_nombre: string;
+  autor_cargo: string;
+  cover_url: string | null;
+  autor_url: string | null;
+  destacado: boolean;
+  created_at: string;
+}
+
 interface ArticulosContextType {
   articulos: Articulo[];
   loading: boolean;
@@ -53,8 +70,8 @@ export function ArticulosProvider({ children }: { children: ReactNode }) {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-
-      const mapped = (data || []).map((a: any) => ({
+      
+      const mapped = (data as ArticuloDB[] || []).map((a) => ({
         id: a.id,
         titulo: a.titulo,
         slug: a.slug,

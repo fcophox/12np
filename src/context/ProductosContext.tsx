@@ -17,6 +17,20 @@ export interface Producto {
   creadoEn: string;
 }
 
+interface ProductoDB {
+  id: string;
+  nombre: string;
+  frase: string;
+  etiqueta: string;
+  etiquetas: string[];
+  orden: number;
+  precio: number | null;
+  destacado: boolean;
+  pausado: boolean;
+  imagen: string | null;
+  created_at: string;
+}
+
 interface ProductosContextType {
   productos: Producto[];
   loading: boolean;
@@ -53,7 +67,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
       
-      const mapped = (data || []).map((p: any) => ({
+      const mapped = (data as ProductoDB[] || []).map((p) => ({
         id: p.id,
         nombre: p.nombre,
         frase: p.frase,
@@ -87,7 +101,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
       .select("*")
       .order("orden", { ascending: true });
 
-    let lista = actuales || [];
+    const lista = (actuales as ProductoDB[] || []);
     
     // 2. Prepare new product (temporary ID for positioning)
     const nuevoTemp = { ...p, id: 'temp' };
@@ -98,8 +112,8 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
 
     // 4. Calculate all new orders
     const updates = lista
-      .filter((item: any) => item.id !== 'temp')
-      .map((item: any, index: number) => ({
+      .filter((item) => item.id !== 'temp')
+      .map((item, index) => ({
         ...item,
         orden: index + 1
       }));
@@ -137,7 +151,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
       .order("orden", { ascending: true });
     
     if (restantes) {
-      const updates = restantes.map((p: any, i: number) => ({ ...p, orden: i + 1 }));
+      const updates = (restantes as ProductoDB[]).map((p, i) => ({ ...p, orden: i + 1 }));
       await supabase.from("productos").upsert(updates);
     }
     
@@ -153,14 +167,14 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
       .neq("id", p.id)
       .order("orden", { ascending: true });
 
-    let lista = actuales || [];
+    const lista = (actuales as ProductoDB[] || []);
     
     // 2. Insert the updated product at its new desired position
     const desiredIndex = Math.max(0, p.orden - 1);
     lista.splice(desiredIndex, 0, p);
 
     // 3. Normalize all orders
-    const updates = lista.map((item: any, index: number) => ({
+    const updates = lista.map((item, index) => ({
       id: item.id,
       nombre: item.nombre,
       frase: item.frase,
