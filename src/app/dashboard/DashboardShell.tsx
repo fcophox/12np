@@ -21,6 +21,7 @@ import { ArticulosProvider } from "@/context/ArticulosContext";
 import { ProductosProvider } from "@/context/ProductosContext";
 import { ContactosProvider } from "@/context/ContactosContext";
 import { CotizacionesProvider } from "@/context/CotizacionesContext";
+import { GaleriaProvider } from "@/context/GaleriaContext";
 import { BrandProvider, useBrand } from "@/context/BrandContext";
 import { logout } from "@/app/login/actions";
 
@@ -278,7 +279,9 @@ function DashboardContent({
             <ProductosProvider>
               <ContactosProvider>
                 <CotizacionesProvider>
-                  {children}
+                  <GaleriaProvider>
+                    {children}
+                  </GaleriaProvider>
                 </CotizacionesProvider>
               </ContactosProvider>
             </ProductosProvider>
