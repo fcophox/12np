@@ -22,7 +22,7 @@ export async function sendContactEmail(formData: {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: '12enpunto <hola@12enpunto.comm>',
+      from: '12enpunto <hola@12enpunto.com>',
       to: ['somos12enpunto@gmail.com'],
       subject: `Nuevo mensaje de Contacto: ${formData.nombre}`,
       html: `
@@ -76,7 +76,7 @@ export async function sendQuotationEmail(formData: {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: '12enpunto <hola@12enpunto.comm>',
+      from: '12enpunto <hola@12enpunto.com>',
       to: ['somos12enpunto@gmail.com'],
       subject: `Nueva Solicitud de Cotización: ${formData.empresa}`,
       html: `
@@ -149,7 +149,7 @@ export async function sendReplyEmail(formData: {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: '12enpunto <hola@12enpunto.comm>',
+      from: '12enpunto <hola@12enpunto.com>',
       to: [formData.to],
       replyTo: 'somos12enpunto@gmail.com',
       subject: formData.subject,
@@ -176,7 +176,7 @@ export async function sendReplyEmail(formData: {
               <strong style="color: #3d332e;">12 en Punto</strong> · Pastelería Artesanal
             </p>
             <p style="font-size: 11px; color: #bbb; margin: 5px 0 0;">
-              <a href="https://12enpunto.comm" style="color: ${accentColor}; text-decoration: none;"12enpunto.comom</a> · 
+              <a href="https://12enpunto.com" style="color: ${accentColor}; text-decoration: none;">12enpunto.com</a> · 
               <a href="https://wa.me/56984172836" style="color: ${accentColor}; text-decoration: none;">WhatsApp</a>
             </p>
           </div>
