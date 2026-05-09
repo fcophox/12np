@@ -6,6 +6,7 @@ import { CheckCircle2, ChevronRight, Phone, Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import B2BBanner from "@/components/B2BBanner";
 import { toast } from "sonner";
+import { sendContactEmail } from "@/app/actions/emailActions";
 
 export default function ContactoClient() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -35,6 +36,19 @@ export default function ContactoClient() {
         }]);
 
       if (error) throw error;
+
+      // Enviar copia por correo
+      try {
+        await sendContactEmail({
+          nombre: formData.nombre,
+          email: formData.email,
+          whatsapp: `+56 9 ${formData.whatsapp}`,
+          mensaje: formData.mensaje
+        });
+      } catch (emailErr) {
+        console.error("Error sending email notification:", emailErr);
+        // No bloqueamos el flujo principal si falla el correo
+      }
       
       setIsSubmitted(true);
       toast.success("Mensaje enviado correctamente");

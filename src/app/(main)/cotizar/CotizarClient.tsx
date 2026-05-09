@@ -6,6 +6,7 @@ import { ChevronRight, ChevronLeft, CheckCircle2, Building2, Package, Send, Cook
 import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { sendQuotationEmail } from "@/app/actions/emailActions";
 
 const FALLBACK_PRODUCTS = [
   {
@@ -159,6 +160,23 @@ export default function CotizarClient() {
         }]);
 
       if (error) throw error;
+
+      // Enviar copia por correo
+      try {
+        await sendQuotationEmail({
+          empresa: formData.empresa,
+          contacto: formData.contacto,
+          email: formData.email,
+          tel: `+56 9 ${formData.tel}`,
+          productos: {
+            seleccionados: formData.productosSeleccionados,
+            cantidades: formData.cantidades
+          },
+          detalleAdicional: formData.productosPersonalizados
+        });
+      } catch (emailErr) {
+        console.error("Error sending email notification:", emailErr);
+      }
       
       setIsSubmitted(true);
       toast.success("Solicitud enviada correctamente");
