@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Cotización para Empresas y Pymes | 12enpunto",
     description: "Solicita una cotización personalizada de pastelería y café para tu empresa o Pyme en Santiago.",
-    url: "https://12enpunto.cl/cotizar",
+    url: "https://12enpunto.com/cotizar",
   },
 };
 

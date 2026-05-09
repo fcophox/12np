@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "12enpunto — Pastelería artesanal y café de especialidad",
     description: "Descubre nuestra selección de Pâtisserie, Viennoiserie y café de especialidad en Santiago, Chile.",
-    url: "https://12enpunto.cl/home",
+    url: "https://12enpunto.com/home",
     images: [{ url: "/images/brand/heroimagen.png", width: 1200, height: 630, alt: "12enpunto — Pastelería artesanal" }],
   },
 };

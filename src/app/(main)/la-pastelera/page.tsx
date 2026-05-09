@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "La Pastelera | 12enpunto",
     description: "Conoce a Francisca, fundadora de 12enpunto. Una historia de pasión, técnica y amor por la pastelería artesanal.",
-    url: "https://12enpunto.cl/la-pastelera",
+    url: "https://12enpunto.com/la-pastelera",
     images: [{ url: "/images/team/francisca.png", width: 800, height: 800, alt: "Francisca, fundadora de 12enpunto" }],
   },
 };

@@ -27,7 +27,7 @@ export default function BlogPostClient({ post }: { post: any }) {
     "@type": "BlogPosting",
     headline: post.titulo,
     description: post.descripcion,
-    image: post.cover_url || "https://12enpunto.cl/images/blog/featured.png",
+    image: post.cover_url || "https://12enpunto.com/images/blog/featured.png",
     datePublished: post.created_at,
     dateModified: post.created_at,
     author: {
@@ -39,9 +39,9 @@ export default function BlogPostClient({ post }: { post: any }) {
     publisher: {
       "@type": "Organization",
       name: "12enpunto",
-      logo: { "@type": "ImageObject", url: "https://12enpunto.cl/images/brand/12np-v.svg" },
+      logo: { "@type": "ImageObject", url: "https://12enpunto.com/images/brand/12np-v.svg" },
     },
-    mainEntityOfPage: { "@type": "WebPage", "@id": `https://12enpunto.cl/blog/${post.slug}` },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `https://12enpunto.com/blog/${post.slug}` },
     keywords: post.etiquetas?.split(",").map((s: string) => s.trim()) || [],
   };
 

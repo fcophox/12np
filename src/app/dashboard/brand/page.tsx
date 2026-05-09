@@ -143,7 +143,7 @@ export default function BrandPage() {
               type="email"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
-              placeholder="hola@12enpunto.cl"
+              placeholder="hola@12enpunto.com"
               className="w-full px-4 py-3 rounded-lg border border-[#3d332e]/10 bg-[#f9f4e8]/30 text-[#3d332e] text-sm focus:outline-none focus:ring-2 focus:ring-[#f15a24]/20 focus:border-[#f15a24] transition"
             />
           </div>

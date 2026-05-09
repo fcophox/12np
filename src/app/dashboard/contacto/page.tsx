@@ -212,7 +212,7 @@ function ContactoDrawer({
                 </div>
 
                 <p className="text-[12px] text-[#3d332e]/30 leading-relaxed">
-                  Se enviará desde <strong>hola@12enpunto.cl</strong> a <strong>{contacto.email}</strong>. El cliente podrá responder a somos12enpunto@gmail.com.
+                  Se enviará desde <strong>hola@12enpunto.com</strong> a <strong>{contacto.email}</strong>. El cliente podrá responder a somos12enpunto@gmail.com.
                 </p>
               </motion.div>
             )}

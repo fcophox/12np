@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Contacto | 12enpunto",
     description: "Escríbenos por email, WhatsApp o completa el formulario. Estamos en Santiago de Chile.",
-    url: "https://12enpunto.cl/contacto",
+    url: "https://12enpunto.com/contacto",
   },
 };
 

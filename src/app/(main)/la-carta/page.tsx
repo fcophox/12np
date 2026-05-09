@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "La Carta | 12enpunto",
     description: "Explora nuestra carta artesanal: Pâtisserie, Viennoiserie y Cafetería de especialidad.",
-    url: "https://12enpunto.cl/la-carta",
+    url: "https://12enpunto.com/la-carta",
     images: [{ url: "/images/products/products1.webp", width: 1200, height: 630, alt: "Torta de Chocolate — 12enpunto" }],
   },
 };
