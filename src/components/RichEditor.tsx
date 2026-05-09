@@ -27,11 +27,13 @@ import {
 } from "lucide-react";
 
 interface RichEditorProps {
+  initialValue?: string;
   onChange?: (html: string) => void;
 }
 
-export default function RichEditor({ onChange }: RichEditorProps) {
+export default function RichEditor({ initialValue = "", onChange }: RichEditorProps) {
   const editor = useEditor({
+    content: initialValue,
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({

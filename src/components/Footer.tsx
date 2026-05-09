@@ -20,12 +20,14 @@ export default function Footer() {
               <ArrowUpRight size={14} />
             </Link>
           </div>
-          <div className="relative w-72 h-36 md:w-80 md:h-40 flex justify-center md:justify-end">
+          <div className="flex justify-center md:justify-end">
             <Image
               src="/images/brand/12np-v.svg"
               alt="12enpunto — Pastelería artesanal"
-              fill
-              className="object-contain object-center md:object-right brightness-0 invert"
+              width={320}
+              height={160}
+              className="brightness-0 invert"
+              style={{ height: 'auto', width: 'auto', maxWidth: '100%' }}
             />
           </div>
         </div>

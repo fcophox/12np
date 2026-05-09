@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Plus, Search, MoreHorizontal } from "lucide-react";
-import { useArticulos } from "@/context/ArticulosContext";
-import { useState } from "react";
+import { FileText, Plus, Search, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useArticulos, Articulo } from "@/context/ArticulosContext";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const estadoBadge: Record<string, string> = {
   publicado: "bg-green-50 text-green-700 border border-green-200",
@@ -27,9 +30,237 @@ function formatDate(iso: string) {
   });
 }
 
+function Dropdown({
+  anchorRef,
+  onClose,
+  onEditar,
+  onEliminar,
+}: {
+  anchorRef: React.RefObject<HTMLButtonElement | null>;
+  onClose: () => void;
+  onEditar: () => void;
+  onEliminar: () => void;
+}) {
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (anchorRef.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 6, left: rect.right - 140 });
+    }
+
+    const handler = (e: MouseEvent) => {
+      if (
+        anchorRef.current && anchorRef.current.contains(e.target as Node) ||
+        contentRef.current && contentRef.current.contains(e.target as Node)
+      ) {
+        return;
+      }
+      onClose();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [anchorRef, onClose]);
+
+  return createPortal(
+    <div
+      ref={contentRef}
+      style={{ top: pos.top, left: pos.left }}
+      className="fixed z-[9999] bg-white border border-[#e8e3dd] rounded-lg shadow-xl py-1 min-w-[150px]"
+    >
+      <button
+        onClick={(e) => { e.stopPropagation(); onEditar(); onClose(); }}
+        className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#3d332e]/70 hover:bg-[#f9f4e8] hover:text-[#3d332e] transition-colors cursor-pointer"
+      >
+        <Pencil size={13} />
+        Editar
+      </button>
+      <div className="my-1 border-t border-[#e8e3dd]" />
+      <button
+        onClick={(e) => { e.stopPropagation(); onEliminar(); onClose(); }}
+        className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+      >
+        <Trash2 size={13} />
+        Eliminar
+      </button>
+    </div>,
+    document.body
+  );
+}
+
+function DeleteModal({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  isDeleting 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onConfirm: () => void;
+  isDeleting: boolean;
+}) {
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-[#3d332e]/40 backdrop-blur-sm transition-opacity" 
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div className="relative bg-white rounded-2xl shadow-2xl border border-[#e8e3dd] w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
+        <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center mb-5">
+          <Trash2 className="text-red-500" size={24} />
+        </div>
+        
+        <h3 className="text-xl font-bold text-[#3d332e] mb-2">
+          ¿Eliminar artículo?
+        </h3>
+        <p className="text-sm text-[#3d332e]/60 mb-8 leading-relaxed">
+          Esta acción no se puede deshacer. El artículo desaparecerá permanentemente de tu blog.
+        </p>
+        
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            disabled={isDeleting}
+            className="flex-1 px-4 py-2.5 rounded-lg border border-[#e8e3dd] text-sm font-semibold text-[#3d332e]/60 hover:bg-[#f9f4e8] transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="flex-1 px-4 py-2.5 rounded-lg bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isDeleting ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : "Eliminar"}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+function ArticleCard({ a, onEliminar }: { a: Articulo; onEliminar: (id: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
+
+  return (
+    <div
+      onClick={() => router.push(`/dashboard/articulos/${a.id}/editar`)}
+      className="bg-white rounded-xl border border-[#e8e3dd] p-5 flex flex-col gap-3 hover:shadow-sm transition-shadow cursor-pointer group"
+    >
+      <div className="flex items-start gap-3">
+        <div className="w-9 h-9 rounded-lg bg-[#f9f4e8] flex items-center justify-center shrink-0 mt-0.5 relative">
+          {a.coverPreview ? (
+            <img src={a.coverPreview} alt="" className="w-full h-full object-cover rounded-lg" />
+          ) : (
+            <FileText size={16} className="text-[#3d332e]/40" />
+          )}
+          {a.destacado && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#f15a24] rounded-full border-2 border-white shadow-sm animate-pulse" title="Artículo destacado" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-[#3d332e] truncate group-hover:text-[#f15a24] transition-colors">
+            {a.titulo}
+          </p>
+          <p className="text-[11px] text-[#3d332e]/35 truncate mt-0.5 font-mono">
+            /{a.slug}
+          </p>
+        </div>
+        <div className="shrink-0 relative" onClick={(e) => e.stopPropagation()}>
+          <button
+            ref={btnRef}
+            onClick={() => setOpen(!open)}
+            className="text-[#3d332e]/25 hover:text-[#3d332e]/60 transition-colors p-1"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+          {open && (
+            <Dropdown
+              anchorRef={btnRef}
+              onClose={() => setOpen(false)}
+              onEditar={() => router.push(`/dashboard/articulos/${a.id}/editar`)}
+              onEliminar={() => onEliminar(a.id)}
+            />
+          )}
+        </div>
+      </div>
+
+      {a.descripcion && (
+        <p className="text-sm text-[#3d332e]/60 line-clamp-2 leading-relaxed">
+          {a.descripcion}
+        </p>
+      )}
+
+      <div className="flex items-center gap-2 flex-wrap mt-1">
+        <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${estadoBadge[a.estado]}`}>
+          {estadoLabel[a.estado]}
+        </span>
+        {a.categoria && (
+          <span className="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#f9f4e8] text-[#3d332e]/50 border border-[#e8e3dd]">
+            {a.categoria}
+          </span>
+        )}
+        <span className="text-[11px] text-[#3d332e]/30 ml-auto font-medium">
+          {formatDate(a.creadoEn)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function ArticulosPage() {
-  const { articulos } = useArticulos();
+  const { articulos, loading, eliminarArticulo } = useArticulos();
   const [busqueda, setBusqueda] = useState("");
+  const [articuloAEliminar, setArticuloAEliminar] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const confirmEliminar = async () => {
+    if (!articuloAEliminar) return;
+    
+    setIsDeleting(true);
+    try {
+      await eliminarArticulo(articuloAEliminar);
+      toast.success("Artículo eliminado");
+    } catch (error) {
+      toast.error("Error al eliminar");
+    } finally {
+      setIsDeleting(false);
+      setArticuloAEliminar(null);
+    }
+  };
+
+  const handleEliminar = (id: string) => {
+    setArticuloAEliminar(id);
+  };
+
+  if (loading) {
+    return (
+      <div className="p-5 md:p-10 max-w-5xl animate-pulse">
+        <div className="flex justify-between mb-10">
+          <div className="space-y-3">
+            <div className="h-10 w-48 bg-[#3d332e]/5 rounded-lg" />
+            <div className="h-4 w-80 bg-[#3d332e]/5 rounded-lg" />
+          </div>
+          <div className="h-11 w-36 bg-[#3d332e]/5 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-44 bg-white rounded-xl border border-[#e8e3dd]" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const filtrados = articulos.filter(
     (a) =>
@@ -38,10 +269,10 @@ export default function ArticulosPage() {
   );
 
   return (
-    <div className="p-10 max-w-5xl">
+    <div className="p-5 md:p-10 max-w-5xl pb-36 md:pb-10">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
+      <div className="flex items-start justify-between mb-8 gap-4">
+        <div className="hidden md:block">
           <h1 className="text-4xl font-bold text-[#3d332e] mb-2">Artículos</h1>
           <p className="text-[#3d332e]/60 text-base">
             Gestiona y publica el contenido de tu plataforma.
@@ -49,7 +280,7 @@ export default function ArticulosPage() {
         </div>
         <Link
           href="/dashboard/articulos/nuevo"
-          className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
+          className="hidden md:flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
         >
           <Plus size={16} />
           Nuevo artículo
@@ -94,7 +325,7 @@ export default function ArticulosPage() {
 
       {/* No results */}
       {articulos.length > 0 && filtrados.length === 0 && (
-        <p className="text-sm text-[#3d332e]/40 text-center py-16">
+        <p className="text-sm text-[#3d332e]/40 text-center py-16 font-medium">
           No se encontraron artículos para &quot;{busqueda}&quot;.
         </p>
       )}
@@ -103,53 +334,29 @@ export default function ArticulosPage() {
       {filtrados.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtrados.map((a) => (
-            <div
-              key={a.id}
-              className="bg-white rounded-xl border border-[#e8e3dd] p-5 flex flex-col gap-3 hover:shadow-sm transition-shadow"
-            >
-              {/* Top row */}
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-[#f9f4e8] flex items-center justify-center shrink-0 mt-0.5">
-                  <FileText size={16} className="text-[#3d332e]/40" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#3d332e] truncate">
-                    {a.titulo}
-                  </p>
-                  <p className="text-[11px] text-[#3d332e]/35 truncate mt-0.5">
-                    /{a.slug}
-                  </p>
-                </div>
-                <button className="text-[#3d332e]/25 hover:text-[#3d332e]/60 transition-colors shrink-0">
-                  <MoreHorizontal size={16} />
-                </button>
-              </div>
-
-              {/* Description */}
-              {a.descripcion && (
-                <p className="text-sm text-[#3d332e]/60 line-clamp-2 leading-relaxed">
-                  {a.descripcion}
-                </p>
-              )}
-
-              {/* Footer */}
-              <div className="flex items-center gap-2 flex-wrap mt-1">
-                <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${estadoBadge[a.estado]}`}>
-                  {estadoLabel[a.estado]}
-                </span>
-                {a.categoria && (
-                  <span className="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#f9f4e8] text-[#3d332e]/50 border border-[#e8e3dd]">
-                    {a.categoria}
-                  </span>
-                )}
-                <span className="text-[11px] text-[#3d332e]/30 ml-auto">
-                  {formatDate(a.creadoEn)}
-                </span>
-              </div>
-            </div>
+            <ArticleCard key={a.id} a={a} onEliminar={handleEliminar} />
           ))}
         </div>
       )}
+
+      {/* Mobile fixed bottom action bar */}
+      <div className="fixed bottom-16 left-0 right-0 z-30 md:hidden bg-white border-t border-[#e8e3dd] px-5 py-4">
+        <Link
+          href="/dashboard/articulos/nuevo"
+          className="w-full flex items-center justify-center gap-2 bg-[#3d332e] text-[#fdfbf7] text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
+        >
+          <Plus size={16} />
+          Nuevo artículo
+        </Link>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={!!articuloAEliminar}
+        onClose={() => setArticuloAEliminar(null)}
+        onConfirm={confirmEliminar}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

@@ -5,12 +5,13 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 export default function NotFound() {
   return (
     <div className="min-h-[80vh] w-full flex flex-col items-center justify-center px-8 py-20 text-center">
-      <div className="relative w-48 h-24 mb-12">
+      <div className="mb-12">
         <Image
           src="/images/brand/12np-v.svg"
           alt="12enpunto Logo"
-          fill
-          className="object-contain"
+          width={192}
+          height={96}
+          style={{ height: 'auto' }}
           priority
         />
       </div>

@@ -26,7 +26,7 @@ export default function B2BBanner() {
         >
           <span className="inline-block px-4 py-1.5 bg-white/10 rounded-full text-white/80 text-[10px] font-bold uppercase tracking-[0.2em]">Pymes & Empresas</span>
           
-          <h2 className="text-4xl md:text-6xl font-bold font-[family-name:var(--font-fraunces)] text-white leading-tight">
+          <h2 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] text-white leading-tight">
             ¿Eres empresa o Pyme? <br />
             <span className="text-[#f15a24]">Trabajemos juntos.</span>
           </h2>

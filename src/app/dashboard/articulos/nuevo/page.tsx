@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, ImagePlus, Save, Upload } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
-import { useArticulos, Articulo } from "@/context/ArticulosContext";
+import { useArticulos } from "@/context/ArticulosContext";
+import { useBrand } from "@/context/BrandContext";
+import { toast } from "sonner";
 
 function slugify(text: string) {
   return text
@@ -26,12 +28,22 @@ export default function NuevoArticuloPage() {
   const [descripcion, setDescripcion] = useState("");
   const [estado, setEstado] = useState("borrador");
   const [categoria, setCategoria] = useState("");
+  const [destacado, setDestacado] = useState(false);
   const [etiquetas, setEtiquetas] = useState("");
   const [autorNombre, setAutorNombre] = useState("");
   const [autorCargo, setAutorCargo] = useState("");
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [autorPreview, setAutorPreview] = useState<string | null>(null);
   const [contenido, setContenido] = useState("");
+
+  const { brand } = useBrand();
+
+  useEffect(() => {
+    if (brand) {
+      if (brand.nombre) setAutorNombre(brand.nombre);
+      if (brand.avatar) setAutorPreview(brand.avatar);
+    }
+  }, [brand]);
 
   const coverInputRef = useRef<HTMLInputElement>(null);
   const autorInputRef = useRef<HTMLInputElement>(null);
@@ -58,31 +70,44 @@ export default function NuevoArticuloPage() {
     if (file) handleImageFile(file, setCoverPreview);
   }, []);
 
-  const guardar = (estadoFinal: Articulo["estado"]) => {
-    if (!titulo.trim()) return alert("El título es obligatorio.");
-    const articulo: Articulo = {
-      id: Date.now().toString(),
-      titulo,
-      slug: slug || slugify(titulo),
-      descripcion,
-      contenido,
-      estado: estadoFinal,
-      categoria,
-      etiquetas,
-      autorNombre,
-      autorCargo,
-      coverPreview,
-      autorPreview,
-      creadoEn: new Date().toISOString(),
-    };
-    agregarArticulo(articulo);
-    router.push("/dashboard/articulos");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const guardar = async (estadoFinal: Articulo["estado"]) => {
+    if (!titulo.trim()) return toast.error("El título es obligatorio.");
+    
+    setIsSaving(true);
+    try {
+      const articulo = {
+        titulo,
+        slug: slug || slugify(titulo),
+        descripcion,
+        contenido,
+        estado: estadoFinal,
+        categoria,
+        etiquetas,
+        autorNombre,
+        autorCargo,
+        coverPreview,
+        autorPreview,
+        destacado,
+      };
+      
+      await agregarArticulo(articulo);
+      toast.success(estadoFinal === "publicado" ? "Artículo publicado" : "Borrador guardado");
+      router.push("/dashboard/articulos");
+    } catch (error: any) {
+      toast.error("Error al guardar", {
+        description: error.message || "No se pudo guardar en la base de datos."
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <div className="p-10 max-w-6xl">
+    <div className="p-5 md:p-10 max-w-6xl pb-36 md:pb-10">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-sm text-[#3d332e]/40 mb-6">
+      <div className="flex items-center gap-1.5 text-xs md:text-sm text-[#3d332e]/40 mb-6">
         <Link href="/dashboard" className="hover:text-[#3d332e] transition-colors">Dashboard</Link>
         <ChevronRight size={13} />
         <Link href="/dashboard/articulos" className="hover:text-[#3d332e] transition-colors">Artículos</Link>
@@ -91,27 +116,30 @@ export default function NuevoArticuloPage() {
       </div>
 
       {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-[#3d332e]">Nuevo artículo</h1>
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-start justify-between mb-8 gap-3">
+        <h1 className="hidden md:block text-3xl font-bold text-[#3d332e]">Nuevo artículo</h1>
+        {/* Desktop buttons */}
+        <div className="hidden md:flex items-center gap-2">
           <button
             onClick={() => guardar("borrador")}
-            className="flex items-center gap-2 border border-[#e8e3dd] bg-white hover:bg-[#f9f4e8] text-[#3d332e] text-sm font-medium px-4 py-2.5 rounded-lg transition-colors cursor-pointer">
+            disabled={isSaving}
+            className="flex items-center gap-2 border border-[#e8e3dd] bg-white hover:bg-[#f9f4e8] disabled:bg-[#f9f4e8]/50 text-[#3d332e] text-sm font-medium px-4 py-2.5 rounded-lg transition-colors cursor-pointer">
             <Save size={15} />
-            Guardar borrador
+            {isSaving && estado === "borrador" ? "Guardando..." : "Guardar borrador"}
           </button>
           <button
             onClick={() => guardar("publicado")}
-            className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors cursor-pointer">
+            disabled={isSaving}
+            className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] disabled:bg-[#3d332e]/50 text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors cursor-pointer">
             <Upload size={15} />
-            Publicar
+            {isSaving && estado === "publicado" ? "Publicando..." : "Publicar"}
           </button>
         </div>
       </div>
 
-      <div className="flex gap-6 items-start">
+      <div className="flex flex-col md:flex-row gap-6 items-start">
         {/* Left - Main form */}
-        <div className="flex-1 flex flex-col gap-5">
+        <div className="flex-1 w-full flex flex-col gap-5">
           {/* Título */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-[#3d332e]">
@@ -160,7 +188,7 @@ export default function NuevoArticuloPage() {
         </div>
 
         {/* Right sidebar */}
-        <div className="w-[280px] shrink-0 flex flex-col gap-4">
+        <div className="w-full md:w-[280px] shrink-0 flex flex-col gap-4">
           {/* Imagen de portada */}
           <div className="bg-white rounded-xl border border-[#e8e3dd] p-5">
             <h3 className="text-sm font-semibold text-[#3d332e] mb-3">Imagen de portada</h3>
@@ -224,6 +252,29 @@ export default function NuevoArticuloPage() {
               <option value="tutoriales">Tutoriales</option>
               <option value="productos">Productos</option>
             </select>
+          </div>
+
+          {/* Destacado */}
+          <div className="bg-white rounded-xl border border-[#e8e3dd] p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-[#3d332e]">Destacado</h3>
+                <p className="text-[10px] text-[#3d332e]/40 mt-0.5">Mostrar en portada principal</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDestacado(!destacado)}
+                className={`w-11 h-6 rounded-full flex items-center transition-colors px-1 ${
+                  destacado ? "bg-[#f15a24]" : "bg-[#e8e3dd]"
+                }`}
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-white transition-transform ${
+                    destacado ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
           {/* Etiquetas */}
@@ -293,6 +344,26 @@ export default function NuevoArticuloPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile fixed bottom bar */}
+      <div className="fixed bottom-16 left-0 right-0 z-30 md:hidden bg-white border-t border-[#e8e3dd] px-5 py-4 flex gap-3">
+        <button
+          onClick={() => guardar("borrador")}
+          disabled={isSaving}
+          className="flex-1 flex items-center justify-center gap-2 border border-[#e8e3dd] bg-white disabled:bg-[#f9f4e8]/50 text-[#3d332e] text-sm font-medium px-4 py-3 rounded-xl transition-colors cursor-pointer"
+        >
+          <Save size={15} />
+          {isSaving && estado === "borrador" ? "..." : "Borrador"}
+        </button>
+        <button
+          onClick={() => guardar("publicado")}
+          disabled={isSaving}
+          className="flex-1 flex items-center justify-center gap-2 bg-[#3d332e] disabled:bg-[#3d332e]/50 text-[#fdfbf7] text-sm font-semibold px-4 py-3 rounded-xl transition-colors cursor-pointer"
+        >
+          <Upload size={15} />
+          {isSaving && estado === "publicado" ? "..." : "Publicar"}
+        </button>
       </div>
     </div>
   );

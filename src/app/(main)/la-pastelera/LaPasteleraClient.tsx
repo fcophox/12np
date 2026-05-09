@@ -1,6 +1,7 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
+import { createClient } from "@/utils/supabase/client";
 import Certificacion from "@/components/Certificacion";
 import PasteleraFeatures from "@/components/PasteleraFeatures";
 import BlurFadeIn from "@/components/BlurFadeIn";
@@ -25,8 +26,38 @@ export default function LaPasteleraClient() {
   const posRef = useRef(0);
   const maxSpeed = 0.5;
 
+  const [author, setAuthor] = useState<{
+    full_name?: string;
+    avatar_url?: string;
+    cargo?: string;
+  } | null>(null);
+
   useEffect(() => {
-    // Only run carousel logic on mobile (if needed, but simple enough to run always and use CSS to hide)
+    // Author Loading logic
+    async function loadAuthor() {
+      const supabase = createClient();
+      
+      // Fetch the most recently updated profile (usually the user's main profile)
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url, cargo")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) {
+        console.error("Error fetching profile:", error);
+      }
+      
+      if (data) {
+        setAuthor(data);
+      } else {
+        console.log("No se encontró ningún perfil. Revisa las políticas RLS en Supabase.");
+      }
+    }
+    loadAuthor();
+
+    // Carousel Logic
     const track = trackRef.current;
     if (!track) return;
 
@@ -50,38 +81,26 @@ export default function LaPasteleraClient() {
 
   return (
     <div className="flex flex-col w-full">
-      {/* Hero Section */}
-      <section className="relative w-full min-h-[80vh] pt-20 pb-32 px-8 md:px-16 overflow-hidden">
+      {/* Header centrado — mismo patrón que La Carta y Contacto */}
+      <header className="w-full pt-12 md:pt-12 pb-12 px-8 md:px-16 text-center space-y-6">
+        <div className="max-w-7xl mx-auto">
+          <span className="block text-[#f15a24] text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase mb-4">Somos 12enpunto</span>
+          <h1 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] leading-[1.15] text-[#1a1a1a] tracking-tight">
+            Todo empezó con <span className="text-[#f15a24]">cariño y compañía</span>
+          </h1>
+          <p className="mt-3 sm:mt-8 text-[clamp(0.8rem,2vw,1rem)] text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed animate-fade-in-up [animation-delay:400ms]">
+            12enpunto no nació solo como una pastelería. Nació como un momento.
+          </p>
+        </div>
+      </header>
+
+      {/* Contenido: imagen izquierda + textos derecha */}
+      <section className="relative w-full px-8 md:px-16 pb-16 md:pb-24 overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-16">
-          {/* Left: Content */}
-          <BlurFadeIn className="w-full md:w-1/2 space-y-10">
-            <div className="space-y-2">
-              <span className="text-[#f15a24] text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase">Somos 12enpunto</span>
-              <h1 className="text-4xl md:text-6xl font-bold font-[family-name:var(--font-fraunces)] leading-tight text-[#1a1a1a]">
-                Todo empezó con <br />
-                <span className="text-[#3d332e]">cariño y compañía</span>
-              </h1>
-              <p className="text-[#f15a24] text-xl md:text-2xl font-bold italic pt-6 font-[family-name:var(--font-fraunces)]">
-              &ldquo;y algo dulce a las 12 en punto&rdquo; 🐾
-              </p>
-            </div>
 
-            <div className="space-y-6 text-lg md:text-xl text-gray-600 leading-relaxed max-w-lg font-medium">
-              <p>
-                12enpunto no nació solo como una pastelería. <span className="text-[#1a1a1a] font-bold">Nació como un momento.</span>
-              </p>
-              <p>
-                Un momento de pausa, de conexión y de compañía. Un momento donde el tiempo se detiene… <span className="text-[#3d332e] font-bold italic">justo a las 12 en punto.</span>
-              </p>
-              <p>
-                Detrás de esta historia estamos nosotras: <span className="text-[#f15a24] italic">yo, amante de la pastelería, y Betty, mi compañera de vida 🐶.</span>
-              </p>
-            </div>
-          </BlurFadeIn>
-
-          {/* Right: Image & Quote */}
-          <BlurFadeIn delay={0.2} className="w-full md:w-1/2 flex flex-col gap-12">
-            <div className="relative aspect-[4/5] md:aspect-[3/4] rounded-[4rem] overflow-hidden shadow-2xl shadow-black/10">
+          {/* Left: Imagen cuadrada */}
+          <BlurFadeIn className="w-full md:w-1/2">
+            <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl shadow-black/10">
               <Image
                 src="/images/team/bettypanchita.jpg"
                 alt="Betty y la pastelera"
@@ -90,28 +109,42 @@ export default function LaPasteleraClient() {
                 priority
               />
             </div>
+          </BlurFadeIn>
 
-            <div className="space-y-8 md:pl-8 lg:pl-12">
-              <p className="text-md md:text-lg text-[#3d332e] leading-relaxed font-light italic">
-              &ldquo;Entre recetas, pruebas, errores y pequeños logros, fuimos construyendo algo más que preparaciones dulces: fuimos creando un espacio lleno de dedicación, paciencia y mucho amor.&rdquo;
+          {/* Right: Textos */}
+          <BlurFadeIn delay={0.2} className="w-full md:w-1/2 flex flex-col justify-center gap-10">
+            <div className="space-y-6 text-[clamp(0.8rem,2vw,1rem)] text-gray-600 leading-relaxed font-medium">
+              <p>
+                Un momento de pausa, de conexión y de compañía. Un momento donde el tiempo se detiene… <span className="text-[#3d332e] font-bold italic">justo a las 12 en punto.</span>
               </p>
+              <p>
+                Detrás de esta historia estamos nosotras: <span className="text-[#f15a24] italic">yo, amante de la pastelería, y Betty, mi compañera de vida 🐶.</span>
+              </p>
+            </div>
 
+            <div className="space-y-6">
+              <p className="text-[clamp(0.8rem,2vw,1rem)] text-[#1a1a1a] leading-relaxed font-base italic">
+                &ldquo;Entre recetas, pruebas, errores y pequeños logros, fuimos construyendo algo más que preparaciones dulces: fuimos creando un espacio lleno de dedicación, paciencia y mucho amor.&rdquo;
+              </p>
               <div className="flex items-center gap-4">
-                <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-orange-100 shadow-sm">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-orange-100 shadow-sm shrink-0">
                   <Image
-                    src="/images/team/francisca.png"
-                    alt="Francisca"
+                    src={author?.avatar_url || "/images/team/francisca.png"}
+                    alt={author?.full_name || "Francisca"}
                     fill
                     className="object-cover"
                   />
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-bold text-[#1a1a1a] text-lg">Francisca</span>
-                  <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">Fundadora & Pastelera de 12enpunto</span>
+                  <span className="font-bold text-[#1a1a1a]">{author?.full_name || "Francisca"}</span>
+                  <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">
+                    {author?.cargo || "Fundadora & Pastelera de 12enpunto"}
+                  </span>
                 </div>
               </div>
             </div>
           </BlurFadeIn>
+
         </div>
       </section>
 
@@ -124,7 +157,7 @@ export default function LaPasteleraClient() {
         <div className="max-w-7xl mx-auto space-y-16">
           <BlurFadeIn className="flex flex-col items-center text-center space-y-4">
             <span className="text-[#f15a24] text-xs font-bold tracking-[0.3em] uppercase">Galería Artesanal</span>
-            <h2 className="text-4xl md:text-6xl font-bold font-[family-name:var(--font-fraunces)] text-[#1a1a1a]">Momentos en el taller</h2>
+            <h2 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] text-[#1a1a1a]">Momentos en el taller</h2>
             <p className="text-gray-500 max-w-lg font-medium">Capturas de nuestra dedicación diaria y los resultados que tanto amamos compartir.</p>
           </BlurFadeIn>
 

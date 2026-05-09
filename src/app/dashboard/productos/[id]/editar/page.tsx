@@ -5,6 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ChevronRight, ImagePlus, Save } from "lucide-react";
 import { useProductos, Producto } from "@/context/ProductosContext";
+import { toast } from "sonner";
 
 export default function EditarProductoPage() {
   const router = useRouter();
@@ -23,12 +24,13 @@ export default function EditarProductoPage() {
   const [creadoEn, setCreadoEn] = useState("");
   const [pausado, setPausado] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const etiquetaInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (loaded) return; // ya cargó, no volver a setear
+    if (loaded) return; 
     const p = productos.find((x) => x.id === id);
     if (p) {
       setNombre(p.nombre);
@@ -70,24 +72,52 @@ export default function EditarProductoPage() {
     if (file) handleFile(file);
   }, []);
 
-  const guardar = () => {
-    if (!nombre.trim()) return alert("El nombre es obligatorio.");
-    const producto: Producto = { id, nombre, frase, etiqueta, etiquetas, orden, precio: precio !== "" ? Number(precio.replace(/\./g, "")) : null, destacado, pausado, imagen, creadoEn };
-    actualizarProducto(producto);
-    router.push("/dashboard/productos");
+  const guardar = async () => {
+    if (!nombre.trim()) return toast.error("El nombre es obligatorio.");
+    
+    setIsSaving(true);
+    try {
+      const producto: Producto = { 
+        id: id as string, 
+        nombre, 
+        frase, 
+        etiqueta, 
+        etiquetas, 
+        orden, 
+        precio: precio !== "" ? Number(precio.replace(/\./g, "")) : null, 
+        destacado, 
+        pausado, 
+        imagen, 
+        creadoEn 
+      };
+      
+      await actualizarProducto(producto);
+      toast.success("Producto actualizado");
+      router.push("/dashboard/productos");
+    } catch (error: any) {
+      toast.error("Error al actualizar", {
+        description: error.message || "No se pudo guardar en la base de datos."
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!loaded) return (
-    <div className="p-10 flex items-center gap-3 text-sm text-[#3d332e]/40">
-      <div className="w-4 h-4 border-2 border-[#3d332e]/20 border-t-[#f15a24] rounded-full animate-spin" />
-      Cargando producto...
+    <div className="p-10 max-w-2xl animate-pulse">
+      <div className="h-6 w-48 bg-[#3d332e]/5 rounded-lg mb-6" />
+      <div className="h-10 w-64 bg-[#3d332e]/5 rounded-lg mb-10" />
+      <div className="space-y-6">
+        <div className="h-40 bg-white rounded-xl border border-[#e8e3dd]" />
+        <div className="h-12 bg-white rounded-xl border border-[#e8e3dd]" />
+      </div>
     </div>
   );
 
   return (
-    <div className="p-10 max-w-2xl">
+    <div className="p-5 md:p-10 max-w-2xl pb-36 md:pb-10">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-sm text-[#3d332e]/40 mb-6">
+      <div className="hidden md:flex items-center gap-1.5 text-sm text-[#3d332e]/40 mb-6">
         <Link href="/dashboard" className="hover:text-[#3d332e] transition-colors">Dashboard</Link>
         <ChevronRight size={13} />
         <Link href="/dashboard/productos" className="hover:text-[#3d332e] transition-colors">Productos</Link>
@@ -97,13 +127,14 @@ export default function EditarProductoPage() {
 
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-[#3d332e]">Editar producto</h1>
+        <h1 className="hidden md:block text-3xl font-bold text-[#3d332e]">Editar producto</h1>
         <button
           onClick={guardar}
-          className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors cursor-pointer"
+          disabled={isSaving}
+          className="hidden md:flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] disabled:bg-[#3d332e]/50 text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors cursor-pointer"
         >
           <Save size={15} />
-          Guardar cambios
+          {isSaving ? "Guardando..." : "Guardar cambios"}
         </button>
       </div>
 
@@ -226,6 +257,18 @@ export default function EditarProductoPage() {
             <p className="text-xs text-[#3d332e]/35">Aparece primero en el catálogo.</p>
           </div>
         </div>
+      </div>
+
+      {/* Mobile fixed bottom action bar */}
+      <div className="fixed bottom-16 left-0 right-0 z-30 md:hidden bg-white border-t border-[#e8e3dd] px-5 py-4">
+        <button
+          onClick={guardar}
+          disabled={isSaving}
+          className="w-full flex items-center justify-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] disabled:bg-[#3d332e]/50 text-[#fdfbf7] text-sm font-semibold px-4 py-3 rounded-xl transition-colors cursor-pointer"
+        >
+          <Save size={15} />
+          {isSaving ? "Guardando..." : "Guardar cambios"}
+        </button>
       </div>
     </div>
   );

@@ -9,35 +9,64 @@ import FeatureGrid from "@/components/FeatureGrid";
 import HeroB from "@/components/HeroB";
 import B2BBanner from "@/components/B2BBanner";
 import BlurFadeIn from "@/components/BlurFadeIn";
+import { createClient } from "@/utils/supabase/client";
 
-const PRODUCTS = [
+const FALLBACK_PRODUCTS = [
   {
-    title: "Torta de Chocolate",
-    desc: "Un clásico irresistible elaborado con cacao al 70% y ganache suave.",
-    image: "/images/products/products1.webp",
+    nombre: "Torta de Chocolate",
+    frase: "Un clásico irresistible elaborado con cacao al 70% y ganache suave.",
+    imagen: "/images/products/products1.webp",
   },
   {
-    title: "Croissant Clásico",
-    desc: "Ideal para acompañar con un espresso por la mañana. Mantequilla pura.",
-    image: "/images/products/products2.webp",
+    nombre: "Croissant Clásico",
+    frase: "Ideal para acompañar con un espresso por la mañana. Mantequilla pura.",
+    imagen: "/images/products/products2.webp",
   },
   {
-    title: "Macarons Surtidos",
-    desc: "Delicadeza francesa en cada bocado, con rellenos de temporada.",
-    image: "/images/products/products3.webp",
+    nombre: "Macarons Surtidos",
+    frase: "Delicadeza francesa en cada bocado, con rellenos de temporada.",
+    imagen: "/images/products/products3.webp",
   },
   {
-    title: "Café Especialidad",
-    desc: "Grano seleccionado de origen único para una experiencia inigualable.",
-    image: "/images/products/products4.webp",
+    nombre: "Café Especialidad",
+    frase: "Grano seleccionado de origen único para una experiencia inigualable.",
+    imagen: "/images/products/products4.webp",
   }
 ];
 
 function ProductsSection() {
   const [activeProduct, setActiveProduct] = useState(0);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    async function loadFeaturedProducts() {
+      const supabase = createClient();
+      try {
+        const { data, error } = await supabase
+          .from("productos")
+          .select("*")
+          .eq("destacado", true)
+          .eq("pausado", false)
+          .order("orden", { ascending: true })
+          .limit(5);
+
+        if (error) throw error;
+        setProducts(data && data.length > 0 ? data : FALLBACK_PRODUCTS);
+      } catch (error) {
+        console.error("Error loading featured products:", error);
+        setProducts(FALLBACK_PRODUCTS);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFeaturedProducts();
+  }, []);
+
+  useEffect(() => {
+    if (loading || products.length === 0) return;
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -54,7 +83,10 @@ function ProductsSection() {
     items?.forEach((item) => observer.observe(item));
 
     return () => observer.disconnect();
-  }, []);
+  }, [loading, products.length]);
+
+  if (loading) return null; // Or a skeleton if preferred
+  if (products.length === 0) return null;
 
   return (
     <section ref={containerRef} className="relative w-full py-8 md:py-32 px-8 md:px-16">
@@ -62,7 +94,7 @@ function ProductsSection() {
         <div className="md:hidden space-y-4 mb-4">
           <div>
             <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">Nuestras estrellas</span>
-            <h2 className="mt-2 text-4xl font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Los favoritos que no puedes perderte</h2>
+            <h2 className="mt-2 text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Los favoritos que no puedes perderte</h2>
             <p className="mt-2 text-gray-500 text-base leading-relaxed">
               Descubre lo que más enamora de nuestra pastelería.
             </p>
@@ -71,17 +103,17 @@ function ProductsSection() {
         </div>
 
         <div className="flex flex-col md:gap-32 gap-10 py-0 md:py-20">
-          {PRODUCTS.map((product, i) => (
+          {products.map((product, i) => (
             <div
               key={i}
               data-index={i}
               className="product-item relative w-full aspect-square rounded-[3rem] overflow-hidden shadow-2xl shadow-black/5"
             >
-              <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 100vw, 500px" className="object-cover" />
+              <Image src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} fill sizes="(max-width: 768px) 100vw, 500px" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent md:hidden" />
               <div className="absolute bottom-0 left-0 right-0 p-8 text-white md:hidden scale-90 origin-bottom-left">
-                <h3 className="text-4xl font-bold font-[family-name:var(--font-fraunces)] mb-2 leading-none">{product.title}</h3>
-                <p className="text-white/80 text-sm font-medium leading-relaxed">{product.desc}</p>
+                <h3 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] mb-2 leading-none">{product.nombre}</h3>
+                <p className="text-white/80 text-sm font-medium leading-relaxed">{product.frase}</p>
               </div>
             </div>
           ))}
@@ -97,11 +129,11 @@ function ProductsSection() {
             </div>
             <div className="w-8 h-px bg-[#c6bfb7]" />
             <div key={activeProduct} className="animate-text-fade">
-              <h2 className="text-5xl md:text-7xl font-bold font-[family-name:var(--font-fraunces)] tracking-tight text-[#3d332e]">
-                {PRODUCTS[activeProduct].title}
+              <h2 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] tracking-tight text-[#3d332e]">
+                {products[activeProduct]?.nombre}
               </h2>
               <p className="text-gray-400 text-lg md:text-xl font-medium max-w-sm leading-relaxed mt-4">
-                {PRODUCTS[activeProduct].desc}
+                {products[activeProduct]?.frase}
               </p>
               <Link
                 href="/la-carta"
@@ -114,7 +146,7 @@ function ProductsSection() {
           </div>
 
           <div className="flex flex-col gap-3 pr-4">
-            {PRODUCTS.map((_, i) => (
+            {products.map((_, i) => (
               <div
                 key={i}
                 className={`transition-all duration-500 ${i === activeProduct ? "w-1.5 h-8 bg-[#f15a24]" : "w-1.5 h-1.5 bg-gray-300"} rounded-full`}
@@ -165,7 +197,7 @@ function NewsCarousel() {
       <BlurFadeIn className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-8">
         <div className="space-y-6 max-w-2xl">
           <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">Creado con amor • desde 2001</span>
-          <h2 className="text-4xl md:text-4xl font-bold font-[family-name:var(--font-fraunces)] leading-tight text-[#1a1a1a]">Sabores intensos, ingredientes locales, creado con amor</h2>
+          <h2 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] leading-tight text-[#1a1a1a]">Sabores intensos, ingredientes locales, creado con amor</h2>
         </div>
       </BlurFadeIn>
       <div className="w-screen -mx-8 md:-mx-16 overflow-hidden">
@@ -193,6 +225,115 @@ function NewsCarousel() {
   );
 }
 
+function BlogSection() {
+  const [featuredPost, setFeaturedPost] = useState<any>(null);
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadBlog() {
+      const supabase = createClient();
+      try {
+        let { data: featured, error: fError } = await supabase
+          .from("articulos")
+          .select("*")
+          .eq("estado", "publicado")
+          .eq("destacado", true)
+          .limit(1)
+          .maybeSingle();
+
+        if (!featured || fError) {
+          const { data: latest } = await supabase
+            .from("articulos")
+            .select("*")
+            .eq("estado", "publicado")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          featured = latest;
+        }
+
+        let query = supabase
+          .from("articulos")
+          .select("*")
+          .eq("estado", "publicado")
+          .order("created_at", { ascending: false })
+          .limit(3);
+
+        if (featured?.id) {
+          query = query.neq("id", featured.id);
+        }
+
+        const { data: recent } = await query;
+        
+        setFeaturedPost(featured);
+        setRecentPosts(recent || []);
+      } catch (error) {
+        console.error("Error loading blog:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadBlog();
+  }, []);
+
+  if (loading || (!featuredPost && recentPosts.length === 0)) return null;
+
+  return (
+    <section className="w-full bg-[#f9f4e8] py-24 px-8 md:px-16 space-y-16">
+      <BlurFadeIn className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-8">
+        <div className="space-y-6 max-w-2xl">
+          <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">Consejos y novedades recientes</span>
+          <h2 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] leading-tight text-[#1a1a1a]">Historias y blogs sobre comida</h2>
+          <p className="text-gray-500 max-w-lg text-sm md:text-base leading-relaxed">Mantente al día con las últimas tendencias en gastronomía, noticias y más.</p>
+        </div>
+        <div className="hidden md:flex items-center gap-4">
+          <Link href="/blog" className="px-8 py-3 bg-transparent text-[#74865e] border-2 border-[#74865e] rounded-full font-bold text-sm hover:bg-[#74865e] hover:text-white transition-all inline-flex items-center gap-2">
+            Leer más <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </BlurFadeIn>
+      <BlurFadeIn delay={0.15} className="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-8 max-w-7xl mx-auto">
+        {featuredPost && (
+          <Link href={`/blog/${featuredPost.slug}`} className="lg:col-span-2 space-y-6 group cursor-pointer block">
+            <div className="relative aspect-[21/9] w-full rounded-[2.5rem] overflow-hidden shadow-2xl">
+              <Image src={featuredPost.cover_url || "/images/blog/featured.png"} alt={featuredPost.titulo} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              {featuredPost.categoria && (
+                <div className="absolute top-6 left-6 px-4 py-1.5 bg-[#f15a24] text-white text-xs font-bold rounded-full uppercase tracking-widest">{featuredPost.categoria}</div>
+              )}
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-gray-500 text-sm font-medium">
+                <Calendar size={16} />
+                <span>{new Date(featuredPost.created_at).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</span>
+              </div>
+              <h3 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] leading-tight group-hover:text-[#f15a24] transition-colors">{featuredPost.titulo}</h3>
+              {featuredPost.descripcion && (
+                <p className="text-gray-500 text-lg leading-relaxed line-clamp-2">{featuredPost.descripcion}</p>
+              )}
+            </div>
+          </Link>
+        )}
+        <div className="flex flex-col gap-10">
+          {recentPosts.map((post) => (
+            <Link key={post.id} href={`/blog/${post.slug}`} className="flex gap-6 group cursor-pointer items-start">
+              <div className="relative w-32 h-32 md:w-36 md:h-24 flex-shrink-0 rounded-3xl overflow-hidden shadow-lg">
+                <Image src={post.cover_url || "/images/blog/post-1.png"} alt={post.titulo} fill className="object-cover transition-transform group-hover:scale-110" />
+              </div>
+              <div className="space-y-3 pt-1">
+                {post.categoria && (
+                  <span className="inline-block px-3 py-1 bg-[#f15a24] text-white text-[10px] font-bold rounded-full uppercase tracking-widest">{post.categoria}</span>
+                )}
+                <h4 className="text-lg font-bold leading-snug group-hover:text-[#f15a24] transition-colors line-clamp-2">{post.titulo}</h4>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </BlurFadeIn>
+    </section>
+  );
+}
+
 export default function FullSiteHome() {
   return (
     <div className="flex flex-col w-full">
@@ -200,41 +341,7 @@ export default function FullSiteHome() {
       <FeatureGrid />
       <div className="w-full flex flex-col items-center">
         <ProductsSection />
-        <section className="w-full bg-[#f9f4e8] py-24 px-8 md:px-16 space-y-16">
-          <BlurFadeIn className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-8">
-            <div className="space-y-6 max-w-2xl">
-              <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">Consejos y novedades recientes</span>
-              <h2 className="text-4xl md:text-6xl font-bold font-[family-name:var(--font-fraunces)] leading-tight text-[#1a1a1a]">Historias y blogs sobre comida</h2>
-              <p className="text-gray-500 max-w-lg text-sm md:text-base leading-relaxed">Mantente al día con las últimas tendencias en gastronomía, noticias y más.</p>
-            </div>
-            <div className="hidden md:flex items-center gap-4">
-              <button className="px-8 py-3 bg-transparent text-[#74865e] border-2 border-[#74865e] rounded-full font-bold text-sm hover:bg-[#74865e] hover:text-white transition-all inline-flex items-center gap-2">Leer más <ArrowUpRight size={16} /></button>
-            </div>
-          </BlurFadeIn>
-          <BlurFadeIn delay={0.15} className="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-8 max-w-7xl mx-auto">
-            <Link href="/blog/el-poder-del-acido" className="lg:col-span-2 space-y-6 group cursor-pointer block">
-              <div className="relative aspect-[21/9] w-full rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <Image src="/images/blog/featured.png" alt="Featured" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute top-6 left-6 px-4 py-1.5 bg-[#f15a24] text-white text-xs font-bold rounded-full">Cocinando</div>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-gray-500 text-sm font-medium"><Calendar size={16} /><span>8 de mayo de 2025</span></div>
-                <h3 className="text-3xl md:text-4xl font-bold font-[family-name:var(--font-fraunces)] leading-tight group-hover:text-[#f15a24] transition-colors">El poder silencioso y oculto del ácido en cada plato</h3>
-              </div>
-            </Link>
-            <div className="flex flex-col gap-10">
-              {[1, 2, 3].map((id) => (
-                <Link key={id} href={`/blog/post-${id}`} className="flex gap-6 group cursor-pointer items-start">
-                  <div className="relative w-32 h-32 md:w-36 md:h-24 flex-shrink-0 rounded-3xl overflow-hidden shadow-lg"><Image src={`/images/blog/post-${id}.png`} alt="Post" fill className="object-cover transition-transform group-hover:scale-110" /></div>
-                  <div className="space-y-3 pt-1">
-                    <span className="inline-block px-3 py-1 bg-[#f15a24] text-white text-[10px] font-bold rounded-full">Cocinando</span>
-                    <h4 className="text-lg font-bold leading-snug group-hover:text-[#f15a24] transition-colors line-clamp-2">Recetas y secretos de la cocina moderna.</h4>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </BlurFadeIn>
-        </section>
+        <BlogSection />
         <NewsCarousel />
         <B2BBanner />
       </div>

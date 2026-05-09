@@ -8,12 +8,13 @@ export default function ComingSoon() {
 
         {/* Logo Section */}
         <div className="space-y-4 flex flex-col items-center">
-          <div className="relative w-48 h-48 md:w-56 md:h-56 animate-fade-in">
+          <div className="animate-fade-in">
             <Image
               src="/images/brand/12np-v.svg"
               alt="12enpunto Logo"
-              fill
-              className="object-contain"
+              width={224}
+              height={224}
+              style={{ height: 'auto' }}
               priority
             />
           </div>

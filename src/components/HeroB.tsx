@@ -3,14 +3,33 @@
 import Image from "next/image";
 import Link from "next/link";
 import BlurFadeIn from "./BlurFadeIn";
+import { useEffect, useState } from "react";
+
+const SLIDER_IMAGES = [
+  "/images/brand/heroimagen.png",
+  "/images/products/products1.webp",
+  "/images/products/products2.webp",
+  "/images/products/products3.webp",
+  "/images/news/cafe.png",
+];
 
 export default function HeroB() {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % SLIDER_IMAGES.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="relative w-full min-h-[80vh] md:h-[80vh] overflow-hidden flex flex-col">
       <Image
         src="/images/brand/background.png"
         alt="Hero B Background"
         fill
+        sizes="100vw"
         className="object-cover"
         priority
       />
@@ -21,16 +40,20 @@ export default function HeroB() {
       <div className="absolute bottom-0 left-0 w-full h-[50vh] bg-gradient-to-t from-white via-white/80 to-transparent md:hidden z-10"></div>
 
       <div className="relative w-full max-w-7xl mx-auto px-8 md:px-16 h-full flex flex-col md:flex-row items-start md:items-center pb-10 sm:pb-16 md:py-0 z-20 gap-8 md:gap-12">
-        {/* Mobile Hero Image */}
-        <BlurFadeIn delay={0.1} className="w-full aspect-[21/9] relative rounded-[2rem] overflow-hidden shadow-2xl md:hidden">
-          <Image
-            src="/images/brand/heroimagen.png"
-            alt="Hero Image Mobile"
-            fill
-            className="object-cover"
-            priority
-          />
-        </BlurFadeIn>
+        {/* Mobile Hero Image Slider */}
+        <div className="w-full aspect-[21/9] relative rounded-[2rem] overflow-hidden shadow-2xl md:hidden">
+          {SLIDER_IMAGES.map((src, i) => (
+            <Image
+              key={src}
+              src={src}
+              alt={`Hero Image ${i + 1}`}
+              fill
+              sizes="100vw"
+              className={`object-cover transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
+              priority={i === 0}
+            />
+          ))}
+        </div>
 
         <div className="w-full md:w-2/3 text-[#3d332e]">
           <BlurFadeIn delay={0.1} className="flex items-center gap-3 mb-4">
@@ -63,7 +86,7 @@ export default function HeroB() {
         {/* Right image handled by absolute SVG so mask reaches viewport right edge */}
       </div>
 
-      {/* Desktop-only masked image */}
+      {/* Desktop-only masked image slider */}
       <div className="absolute top-0 right-0 h-full pointer-events-none z-10 hidden md:flex items-start justify-end ">
         <svg viewBox="0 0 1131 680" preserveAspectRatio="xMaxYMid meet" className="h-full w-auto block -mr-80">
           <defs>
@@ -71,9 +94,44 @@ export default function HeroB() {
               <path d="M1131 680H13.1621C4.6662 658.311 0 634.701 0 610C0 503.961 85.9613 418 192 418C198.547 418 205.017 418.328 211.395 418.968C211.132 413.011 211 407.021 211 401C211 179.534 390.534 0 612 0H1131V680Z" />
             </clipPath>
           </defs>
-          {/* Image preserves its proportion and is aligned to the right inside the SVG */}
-          <image href="/images/brand/heroimagen.png" x="0" y="0" width="1090" height="680" preserveAspectRatio="xMaxYMid slice" clipPath="url(#heroMask)" />
+          {SLIDER_IMAGES.map((src, i) => (
+            <image
+              key={src}
+              href={src}
+              x="0"
+              y="0"
+              width="1090"
+              height="680"
+              preserveAspectRatio="xMaxYMid slice"
+              clipPath="url(#heroMask)"
+              style={{
+                opacity: i === current ? 1 : 0,
+                transition: "opacity 0.7s ease-in-out",
+              }}
+            />
+          ))}
         </svg>
+      </div>
+
+      {/* Vertical slide indicator - Desktop */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-2">
+        {SLIDER_IMAGES.map((_, i) => (
+          <div
+            key={i}
+            className="relative flex items-center justify-center"
+            style={{ width: 8, height: i === current ? 28 : 8 }}
+          >
+            <div
+              style={{
+                width: 6,
+                height: i === current ? 28 : 6,
+                borderRadius: 9999,
+                backgroundColor: i === current ? "#e8601c" : "#d9d2ca",
+                transition: "all 0.4s cubic-bezier(0.4,0,0.2,1)",
+              }}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Decorative shadow under plate (right) */}

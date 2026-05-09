@@ -1,34 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronLeft, CheckCircle2, Building2, Package, Send, Cookie, ClipboardList, Pencil } from "lucide-react";
 import Image from "next/image";
+import { createClient } from "@/utils/supabase/client";
 
-const PRODUCTS = [
+const FALLBACK_PRODUCTS = [
   {
     id: "torta",
-    title: "Torta de Chocolate",
-    image: "/images/products/products1.webp",
+    nombre: "Torta de Chocolate",
+    imagen: "/images/products/products1.webp",
   },
   {
     id: "croissant",
-    title: "Croissant Clásico",
-    image: "/images/products/products2.webp",
+    nombre: "Croissant Clásico",
+    imagen: "/images/products/products2.webp",
   },
   {
     id: "macarons",
-    title: "Macarons Surtidos",
-    image: "/images/products/products3.webp",
+    nombre: "Macarons Surtidos",
+    imagen: "/images/products/products3.webp",
   },
   {
     id: "cafe",
-    title: "Café Especialidad",
-    image: "/images/products/products4.webp",
+    nombre: "Café Especialidad",
+    imagen: "/images/products/products4.webp",
   }
 ];
 
 export default function CotizarClient() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -50,6 +53,28 @@ export default function CotizarClient() {
 
   const nextStep = () => setStep((s) => Math.min(s + 1, 4));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+
+  useEffect(() => {
+    async function loadProducts() {
+      const supabase = createClient();
+      try {
+        const { data, error } = await supabase
+          .from("productos")
+          .select("*")
+          .eq("pausado", false)
+          .order("orden", { ascending: true });
+
+        if (error) throw error;
+        setProducts(data && data.length > 0 ? data : FALLBACK_PRODUCTS);
+      } catch (error) {
+        console.error("Error loading products:", error);
+        setProducts(FALLBACK_PRODUCTS);
+      } finally {
+        setLoadingProducts(false);
+      }
+    }
+    loadProducts();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -138,47 +163,53 @@ export default function CotizarClient() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] py-12 px-8">
-      <div className="max-w-4xl mx-auto space-y-10">
-
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl md:text-5xl font-bold font-[family-name:var(--font-fraunces)] text-[#1a1a1a] tracking-tight">
-            Cotización para <span className="text-[#f15a24]"> Pymes & Empresas</span>
+    <div className="min-h-screen bg-[#fdfbf7]">
+      {/* Header centrado — mismo patrón que páginas internas */}
+      <header className="w-full pt-12 md:pt-12 pb-12 px-8 md:px-16 text-center space-y-6">
+        <div className="max-w-4xl mx-auto">
+          <span className="block text-[#f15a24] text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase mb-4">Pymes & Empresas</span>
+          <h1 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] leading-[1.15] text-[#1a1a1a] tracking-tight">
+            Cotización para <span className="text-[#f15a24]">tu negocio</span>
           </h1>
-          <p className="text-gray-400 text-sm max-w-2xl">
+          <p className="mt-8 text-[clamp(0.8rem,2vw,1rem)] text-[#3d332e]/70 max-w-3xl mx-auto font-medium leading-relaxed">
             Ayúdanos a entender las necesidades de tu negocio para ofrecerte los mejores sabores.
           </p>
         </div>
+      </header>
 
-        {/* Stepper Indicator */}
-        <div className="relative max-w-3xl mx-auto">
-          <div className="flex justify-between items-center relative z-10">
-            {steps.map((s) => (
-              <div key={s.id} className="flex flex-col items-center gap-2">
-                <div
-                  className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 border-2 ${step >= s.id ? 'bg-[#3d332e] text-white border-[#3d332e]' : 'bg-white text-gray-300 border-gray-100'
-                    } ${step === s.id ? 'ring-4 ring-[#3d332e]/10 scale-110' : ''}`}
-                >
-                  <s.icon size={16} className="md:w-5 md:h-5" />
+      <div className="w-full px-8 md:px-16 pb-16">
+        <div className="max-w-5xl mx-auto relative pt-1">
+          
+          {/* Stepper Indicator - Solapado sobre la card */}
+          <div className="absolute -top-4 md:-top-6 left-1/2 -translate-x-1/2 w-full max-w-3xl z-30 px-8">
+            <div className="flex justify-between items-center relative">
+              {steps.map((s) => (
+                <div key={s.id} className="flex flex-col items-center">
+                  <div
+                    className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all duration-500 border-4 ${
+                      step >= s.id 
+                        ? 'bg-[#3d332e] text-white border-[#fdfbf7]' 
+                        : 'bg-white text-gray-300 border-gray-50'
+                    } ${step === s.id ? 'ring-8 ring-[#3d332e]/5 scale-110 shadow-xl' : 'shadow-lg shadow-black/5'}`}
+                  >
+                    <s.icon size={18} className="md:w-6 md:h-6" />
+                  </div>
                 </div>
-                <span className={`text-[9px] uppercase font-bold tracking-[0.1em] transition-colors ${step >= s.id ? 'text-[#3d332e]' : 'text-gray-300'}`}>
-                  {s.title}
-                </span>
-              </div>
-            ))}
+              ))}
+              
+              {/* Connecting Lines */}
+              <div className="absolute top-5 md:top-7 left-0 w-full h-0.5 bg-gray-100 -z-10" />
+              <motion.div
+                className="absolute top-5 md:top-7 left-0 h-0.5 bg-[#3d332e] -z-10"
+                initial={{ width: "0%" }}
+                animate={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
           </div>
-          <div className="absolute top-5 md:top-6 left-0 w-full h-0.5 bg-gray-100 -z-10" />
-          <motion.div
-            className="absolute top-5 md:top-6 left-0 h-0.5 bg-[#3d332e] -z-10"
-            initial={{ width: "0%" }}
-            animate={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
-            transition={{ duration: 0.5 }}
-          />
-        </div>
 
-        {/* Form Container */}
-        <div className="bg-white rounded-[2rem] p-6 md:p-10 shadow-xl shadow-black/[0.03] border border-[#3d332e]/5 relative overflow-hidden">
+          {/* Form Container */}
+          <div className="bg-white rounded-[3rem] p-8 md:p-16 pt-16 md:pt-24 shadow-2xl shadow-black/[0.03] border border-[#3d332e]/5 relative overflow-hidden z-10">
           <AnimatePresence mode="wait">
             <motion.form
               key={step}
@@ -191,116 +222,127 @@ export default function CotizarClient() {
             >
               {step === 1 && (
                 <div className="space-y-8">
-                  <div className="text-center md:text-left space-y-2">
-                    <h3 className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Selecciona tus productos</h3>
-                    <p className="text-gray-400 text-sm">Elige los productos básicos que te interesan para tu negocio.</p>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-[clamp(1rem,5vw,1.2rem)] font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Selecciona productos que deseas</h3>
+                    <p className="text-gray-400 text-sm">Elige los productos que te interesan para tu negocio.</p>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                    {PRODUCTS.map((p) => (
-                      <motion.div
-                        key={p.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => toggleProduct(p.id)}
-                        className={`cursor-pointer group relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${formData.productosSeleccionados.includes(p.id)
-                          ? 'border-[#f15a24] shadow-xl shadow-orange-500/10'
-                          : 'border-transparent bg-gray-50'
-                          }`}
-                      >
-                        <div className="aspect-square relative">
-                          <Image
-                            src={p.image}
-                            alt={p.title}
-                            fill
-                            className={`object-cover transition-transform duration-500 group-hover:scale-110 ${formData.productosSeleccionados.includes(p.id) ? 'opacity-90' : 'opacity-100'
-                              }`}
-                          />
-                          <div className={`absolute inset-0 bg-[#f15a24]/10 transition-opacity duration-300 ${formData.productosSeleccionados.includes(p.id) ? 'opacity-100' : 'opacity-0'
-                            }`} />
+                    {loadingProducts ? (
+                      <div className="col-span-2 lg:col-span-4 flex justify-center py-10">
+                        <div className="w-8 h-8 border-4 border-[#3d332e]/10 border-t-[#f15a24] rounded-full animate-spin" />
+                      </div>
+                    ) : (
+                      products.map((p) => (
+                        <motion.div
+                          key={p.id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => toggleProduct(p.id)}
+                          className={`cursor-pointer group relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${formData.productosSeleccionados.includes(p.id)
+                            ? 'border-[#f15a24] shadow-xl shadow-orange-500/10'
+                            : 'border-transparent bg-gray-50'
+                            }`}
+                        >
+                          <div className="aspect-square relative">
+                            <Image
+                              src={p.imagen || "/images/products/products1.webp"}
+                              alt={p.nombre}
+                              fill
+                              className={`object-cover transition-transform duration-500 group-hover:scale-110 ${formData.productosSeleccionados.includes(p.id) ? 'opacity-90' : 'opacity-100'
+                                }`}
+                            />
+                            <div className={`absolute inset-0 bg-[#f15a24]/10 transition-opacity duration-300 ${formData.productosSeleccionados.includes(p.id) ? 'opacity-100' : 'opacity-0'
+                              }`} />
 
-                          {formData.productosSeleccionados.includes(p.id) && (
-                            <div className="absolute top-3 right-3 w-6 h-6 bg-[#f15a24] rounded-full flex items-center justify-center text-white shadow-lg">
-                              <CheckCircle2 size={14} />
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-4 bg-white">
-                          <h4 className={`text-xs font-bold uppercase tracking-tight text-center ${formData.productosSeleccionados.includes(p.id) ? 'text-[#f15a24]' : 'text-[#3d332e]'
-                            }`}>
-                            {p.title}
-                          </h4>
-                        </div>
-                      </motion.div>
-                    ))}
+                            {formData.productosSeleccionados.includes(p.id) && (
+                              <div className="absolute top-3 right-3 w-6 h-6 bg-[#f15a24] rounded-full flex items-center justify-center text-white shadow-lg">
+                                <CheckCircle2 size={14} />
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-4 bg-white">
+                            <h4 className={`text-xs font-bold uppercase tracking-tight text-center ${formData.productosSeleccionados.includes(p.id) ? 'text-[#f15a24]' : 'text-[#3d332e]'
+                              }`}>
+                              {p.nombre}
+                            </h4>
+                          </div>
+                        </motion.div>
+                      ))
+                    )}
                   </div>
                 </div>
               )}
 
               {step === 2 && (
                 <div className="space-y-8">
-                  <div className="text-center md:text-left space-y-2">
-                    <h3 className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Cantidades</h3>
-                    <p className="text-gray-400 text-sm">Define cuánto necesitas de cada producto seleccionado.</p>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-[clamp(1rem,5vw,1.2rem)] font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Cantidad por producto</h3>
+                    <p className="text-gray-400 text-sm">Indica las unidades deseadas para cada producto y comentanos si tienes alguna fecha especial.</p>
                   </div>
 
-                  {formData.productosSeleccionados.length > 0 ? (
+                  <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                    {/* Columna Izquierda: Lista de Productos */}
                     <div className="space-y-4">
-                      {formData.productosSeleccionados.map((id) => {
-                        const product = PRODUCTS.find(p => p.id === id);
-                        if (!product) return null;
-                        return (
-                          <div key={id} className="flex items-center justify-between p-4 bg-[#fdfbf7] rounded-2xl border border-[#3d332e]/5 group hover:border-[#f15a24]/30 transition-colors">
-                            <div className="flex items-center gap-4">
-                              <div className="relative w-16 h-16 rounded-xl overflow-hidden shadow-sm">
-                                <Image src={product.image} alt={product.title} fill className="object-cover" />
+                      {formData.productosSeleccionados.length > 0 ? (
+                        formData.productosSeleccionados.map((id) => {
+                          const product = products.find(p => p.id === id);
+                          if (!product) return null;
+                          return (
+                            <div key={id} className="flex items-center justify-between p-4 bg-[#fdfbf7] rounded-2xl border border-[#3d332e]/5 group hover:border-[#f15a24]/30 transition-colors">
+                              <div className="flex items-center gap-4">
+                                <div className="relative w-16 h-16 rounded-xl overflow-hidden shadow-sm">
+                                  <Image src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} fill className="object-cover" />
+                                </div>
+                                <div>
+                                  <h4 className="text-sm font-bold text-[#3d332e] uppercase tracking-tight">{product.nombre}</h4>
+                                  {/* <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Empresarial</p> */}
+                                </div>
                               </div>
-                              <div>
-                                <h4 className="text-sm font-bold text-[#3d332e] uppercase tracking-tight">{product.title}</h4>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Empresarial</p>
+                              <div className="flex flex-col items-end gap-1.5">
+                                <label className="text-[9px] uppercase font-bold tracking-[0.2em] text-[#3d332e]/40 mr-1">Unidades</label>
+                                <input
+                                  required
+                                  type="number"
+                                  min="1"
+                                  value={formData.cantidades[id] || ""}
+                                  onChange={(e) => handleQuantityChange(id, e.target.value)}
+                                  className="w-20 px-3 py-2 bg-white border border-[#3d332e]/10 rounded-xl focus:outline-none focus:border-[#f15a24] text-right font-bold text-[#3d332e] transition-colors"
+                                />
                               </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#3d332e]/30">Unidades:</label>
-                              <input
-                                required
-                                type="number"
-                                min="1"
-                                value={formData.cantidades[id] || ""}
-                                onChange={(e) => handleQuantityChange(id, e.target.value)}
-                                className="w-24 px-4 py-3 bg-white border border-[#3d332e]/10 rounded-xl focus:outline-none focus:border-[#f15a24] text-center font-bold text-[#3d332e] transition-colors"
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })
+                      ) : (
+                        <div className="p-8 text-center bg-[#fdfbf7] rounded-3xl border-2 border-dashed border-gray-100">
+                          <p className="text-gray-400 text-sm font-medium">No has seleccionado productos en el paso anterior.</p>
+                          <button type="button" onClick={() => setStep(1)} className="mt-2 text-[#f15a24] font-bold text-xs uppercase tracking-widest hover:underline">
+                            Volver a productos
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="p-8 text-center bg-[#fdfbf7] rounded-3xl border-2 border-dashed border-gray-100">
-                      <p className="text-gray-400 text-sm font-medium">No has seleccionado productos en el paso anterior.</p>
-                      <button type="button" onClick={() => setStep(1)} className="mt-2 text-[#f15a24] font-bold text-xs uppercase tracking-widest hover:underline">
-                        Volver a productos
-                      </button>
-                    </div>
-                  )}
 
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#3d332e]/40 ml-1">¿Tienes alguna estimación de tiempo para este requerimiento?</label>
-                    <textarea
-                      name="productosPersonalizados"
-                      value={formData.productosPersonalizados}
-                      onChange={handleChange}
-                      placeholder="Ej: Lo necesito para fines de mes, o en 2 semanas..."
-                      rows={4}
-                      className="w-full px-5 py-4 bg-[#fdfbf7] border border-[#3d332e]/5 rounded-2xl focus:outline-none focus:border-[#f15a24] resize-none"
-                    />
+                    {/* Columna Derecha: Estimación de tiempo */}
+                    <div className="space-y-4 h-full flex flex-col">
+                      <div className="space-y-2 flex-1">
+                        <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#3d332e]/40 ml-1">¿Tienes alguna estimación de tiempo en mente?</label>
+                        <textarea
+                          name="productosPersonalizados"
+                          value={formData.productosPersonalizados}
+                          onChange={handleChange}
+                          placeholder="Ej: Lo necesito para fines de mes, o en 2 semanas..."
+                          className="w-full h-[200px] md:h-[calc(100%-2rem)] px-5 py-4 bg-[#fdfbf7] border border-[#3d332e]/5 rounded-2xl focus:outline-none focus:border-[#f15a24] resize-none"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
               {step === 3 && (
                 <div className="space-y-6">
-                  <div className="text-center md:text-left space-y-2 mb-8">
-                    <h3 className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Datos de tu Empresa</h3>
+                  <div className="text-center space-y-2 mb-8">
+                    <h3 className="text-[clamp(1rem,5vw,1.2rem)] font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Datos de tu Pyme o Empresa</h3>
                     <p className="text-gray-400 text-sm">Cuéntanos sobre tu negocio para personalizar tu propuesta.</p>
                   </div>
                   <div className="space-y-2">
@@ -355,9 +397,9 @@ export default function CotizarClient() {
 
               {step === 4 && (
                 <div className="space-y-6">
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Revisa tu solicitud</h3>
-                    <p className="text-gray-400 text-sm">Confirma que todo esté correcto antes de enviar.</p>
+                  <div className="space-y-1 text-center">
+                    <h3 className="text-[clamp(1rem,5vw,1.2rem)] font-bold font-[family-name:var(--font-fraunces)] text-[#3d332e]">Revisemos tu solicitud</h3>
+                    <p className="text-gray-400 text-sm">Puedes confirmar que todo esté correcto antes de enviar o bien, puede editar algo si lo deseas.</p>
                   </div>
 
                   {/* 2 columnas: Empresa | Productos */}
@@ -393,15 +435,15 @@ export default function CotizarClient() {
                       {formData.productosSeleccionados.length > 0 ? (
                         <div className="divide-y divide-[#3d332e]/5 border border-[#3d332e]/5 rounded-2xl overflow-hidden">
                           {formData.productosSeleccionados.map((id) => {
-                            const product = PRODUCTS.find(p => p.id === id);
+                            const product = products.find(p => p.id === id);
                             if (!product) return null;
                             return (
                               <div key={id} className="flex items-center justify-between px-4 py-3 bg-[#fdfbf7]">
                                 <div className="flex items-center gap-3">
                                   <div className="relative w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                                    <Image src={product.image} alt={product.title} fill className="object-cover" />
+                                    <Image src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} fill className="object-cover" />
                                   </div>
-                                  <span className="text-sm font-bold text-[#3d332e]">{product.title}</span>
+                                  <span className="text-sm font-bold text-[#3d332e]">{product.nombre}</span>
                                 </div>
                                 <span className="text-sm font-bold text-[#f15a24]">{formData.cantidades[id] || "—"} uds.</span>
                               </div>
@@ -424,7 +466,7 @@ export default function CotizarClient() {
 
                   {/* Aviso */}
                   <p className="text-xs text-gray-400 leading-relaxed border-t border-[#3d332e]/5 pt-4">
-                    Al confirmar, enviarás esta solicitud a <span className="font-bold text-[#3d332e]">12 en Punto</span>. Nos pondremos en contacto contigo en menos de 24 horas hábiles.
+                    Al confirmar, enviarás esta solicitud al equipo de <span className="font-bold text-[#3d332e]">12 en Punto</span>. Nos pondremos en contacto contigo en menos de 24 horas hábiles.
                   </p>
                 </div>
               )}
@@ -476,5 +518,6 @@ export default function CotizarClient() {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

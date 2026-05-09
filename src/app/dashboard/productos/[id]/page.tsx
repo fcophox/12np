@@ -25,9 +25,9 @@ export default function ProductoDetailPage() {
   );
 
   return (
-    <div className="p-10 max-w-3xl">
+    <div className="p-5 md:p-10 max-w-3xl pb-36 md:pb-10">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-sm text-[#3d332e]/40 mb-6">
+      <div className="hidden md:flex items-center gap-1.5 text-sm text-[#3d332e]/40 mb-6">
         <Link href="/dashboard" className="hover:text-[#3d332e] transition-colors">Dashboard</Link>
         <ChevronRight size={13} />
         <Link href="/dashboard/productos" className="hover:text-[#3d332e] transition-colors">Productos</Link>
@@ -38,10 +38,10 @@ export default function ProductoDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8 gap-4">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="text-[#3d332e]/30 hover:text-[#3d332e] transition-colors cursor-pointer">
+          <button onClick={() => router.back()} className="text-[#3d332e]/30 hover:text-[#3d332e] transition-colors cursor-pointer hidden md:block">
             <ArrowLeft size={18} />
           </button>
-          <h1 className="text-3xl font-bold text-[#3d332e]">{producto.nombre}</h1>
+          <h1 className="hidden md:block text-3xl font-bold text-[#3d332e]">{producto.nombre}</h1>
           {producto.pausado && (
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#3d332e]/10 text-[#3d332e]/50 uppercase tracking-wide">Pausado</span>
           )}
@@ -51,7 +51,7 @@ export default function ProductoDetailPage() {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="hidden md:flex items-center gap-2 shrink-0">
           <button
             onClick={() => pausarProducto(producto.id)}
             className="flex items-center gap-2 border border-[#e8e3dd] bg-white hover:bg-[#f9f4e8] text-[#3d332e]/70 text-sm font-medium px-3 py-2 rounded-lg transition-colors cursor-pointer"
@@ -69,7 +69,7 @@ export default function ProductoDetailPage() {
         </div>
       </div>
 
-      <div className="flex gap-6 items-start">
+      <div className="flex flex-col md:flex-row gap-6 items-start">
         {/* Left */}
         <div className="flex-1 flex flex-col gap-4">
           {/* Imagen */}
@@ -110,7 +110,7 @@ export default function ProductoDetailPage() {
         </div>
 
         {/* Right sidebar */}
-        <div className="w-[220px] shrink-0 flex flex-col gap-4">
+        <div className="w-full md:w-[220px] shrink-0 flex flex-col gap-4">
           {/* Precio */}
           <div className="bg-white rounded-xl border border-[#e8e3dd] p-5">
             <p className="text-xs font-bold uppercase tracking-widest text-[#3d332e]/30 mb-2">Precio</p>
@@ -151,6 +151,24 @@ export default function ProductoDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile fixed bottom action bar */}
+      <div className="fixed bottom-16 left-0 right-0 z-30 md:hidden bg-white border-t border-[#e8e3dd] px-5 py-4 flex gap-3">
+        <button
+          onClick={() => pausarProducto(producto.id)}
+          className="flex-1 flex items-center justify-center gap-2 border border-[#e8e3dd] bg-white text-[#3d332e] text-sm font-medium px-4 py-3 rounded-xl transition-colors cursor-pointer"
+        >
+          {producto.pausado ? <PlayCircle size={15} /> : <PauseCircle size={15} />}
+          {producto.pausado ? "Reanudar" : "Pausar"}
+        </button>
+        <Link
+          href={`/dashboard/productos/${producto.id}/editar`}
+          className="flex-1 flex items-center justify-center gap-2 bg-[#3d332e] text-[#fdfbf7] text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
+        >
+          <Pencil size={15} />
+          Editar
+        </Link>
       </div>
     </div>
   );

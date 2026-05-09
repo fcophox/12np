@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, ImagePlus, Save } from "lucide-react";
-import { useProductos, Producto } from "@/context/ProductosContext";
+import { useProductos } from "@/context/ProductosContext";
+import { toast } from "sonner";
 
 export default function NuevoProductoPage() {
   const router = useRouter();
@@ -56,29 +57,41 @@ export default function NuevoProductoPage() {
     if (file) handleFile(file);
   }, []);
 
-  const guardar = () => {
-    if (!nombre.trim()) return alert("El nombre es obligatorio.");
-    const producto: Producto = {
-      id: Date.now().toString(),
-      nombre,
-      frase,
-      etiqueta,
-      etiquetas,
-      orden,
-      precio: precio !== "" ? Number(precio.replace(/\./g, "")) : null,
-      destacado,
-      pausado: false,
-      imagen,
-      creadoEn: new Date().toISOString(),
-    };
-    agregarProducto(producto);
-    router.push("/dashboard/productos");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const guardar = async () => {
+    if (!nombre.trim()) return toast.error("El nombre es obligatorio.");
+    
+    setIsSaving(true);
+    try {
+      const producto = {
+        nombre,
+        frase,
+        etiqueta,
+        etiquetas,
+        orden,
+        precio: precio !== "" ? Number(precio.replace(/\./g, "")) : null,
+        destacado,
+        pausado: false,
+        imagen,
+      };
+      
+      await agregarProducto(producto);
+      toast.success("Producto creado con éxito");
+      router.push("/dashboard/productos");
+    } catch (error: any) {
+      toast.error("Error al crear producto", {
+        description: error.message || "No se pudo guardar en la base de datos."
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <div className="p-10 max-w-2xl">
+    <div className="p-5 md:p-10 max-w-2xl pb-36 md:pb-10">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-sm text-[#3d332e]/40 mb-6">
+      <div className="flex items-center gap-1.5 text-xs md:text-sm text-[#3d332e]/40 mb-6">
         <Link href="/dashboard" className="hover:text-[#3d332e] transition-colors">Dashboard</Link>
         <ChevronRight size={13} />
         <Link href="/dashboard/productos" className="hover:text-[#3d332e] transition-colors">Productos</Link>
@@ -87,14 +100,16 @@ export default function NuevoProductoPage() {
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-[#3d332e]">Nuevo producto</h1>
+      <div className="flex items-start justify-between mb-8 gap-4">
+        <h1 className="hidden md:block text-3xl font-bold text-[#3d332e]">Nuevo producto</h1>
+        {/* Desktop button */}
         <button
           onClick={guardar}
-          className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors cursor-pointer"
+          disabled={isSaving}
+          className="hidden md:flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] disabled:bg-[#3d332e]/50 text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors cursor-pointer"
         >
           <Save size={15} />
-          Guardar producto
+          {isSaving ? "Guardando..." : "Guardar producto"}
         </button>
       </div>
 
@@ -275,6 +290,18 @@ export default function NuevoProductoPage() {
             <p className="text-xs text-[#3d332e]/35">Aparece primero en el catálogo.</p>
           </div>
         </div>
+      </div>
+
+      {/* Mobile fixed bottom bar */}
+      <div className="fixed bottom-16 left-0 right-0 z-30 md:hidden bg-white border-t border-[#e8e3dd] px-5 py-4">
+        <button
+          onClick={guardar}
+          disabled={isSaving}
+          className="w-full flex items-center justify-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] disabled:bg-[#3d332e]/50 text-[#fdfbf7] text-sm font-semibold px-4 py-3 rounded-xl transition-colors cursor-pointer"
+        >
+          <Save size={15} />
+          {isSaving ? "Guardando..." : "Guardar producto"}
+        </button>
       </div>
     </div>
   );

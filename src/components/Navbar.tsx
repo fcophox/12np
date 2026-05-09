@@ -69,6 +69,7 @@ export default function Navbar() {
               <Link href="/" className="hover:text-[#f15a24] transition-colors whitespace-nowrap">Inicio</Link>
               <Link href="/la-carta" className="hover:text-[#f15a24] transition-colors whitespace-nowrap">La carta</Link>
               <Link href="/la-pastelera" className="hover:text-[#f15a24] transition-colors whitespace-nowrap">La pastelera</Link>
+              <Link href="/blog" className="hover:text-[#f15a24] transition-colors whitespace-nowrap">Blog</Link>
               <Link href="/contacto" className="hover:text-[#f15a24] transition-colors whitespace-nowrap">Contacto</Link>
               <Link href="/cotizar" className="inline-flex items-center gap-2 px-6 py-3 border-2 border-[#74865e] text-[#74865e] rounded-full hover:bg-[#74865e] hover:text-white transition-all whitespace-nowrap font-medium text-sm">
                 Pymes & Empresas
@@ -94,6 +95,7 @@ export default function Navbar() {
         <Link href="/" className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-white hover:text-[#f15a24] transition-colors uppercase tracking-widest">Inicio</Link>
         <Link href="/la-carta" className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-white hover:text-[#f15a24] transition-colors uppercase tracking-widest">La carta</Link>
         <Link href="/la-pastelera" className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-white hover:text-[#f15a24] transition-colors uppercase tracking-widest">La pastelera</Link>
+        <Link href="/blog" className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-white hover:text-[#f15a24] transition-colors uppercase tracking-widest">Blog</Link>
         <Link href="/contacto" className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-[#f15a24] hover:text-white transition-colors uppercase tracking-widest text-center">Estemos en contacto</Link>
 
         <div className="mt-12 pt-12 border-t border-white/10 w-64 flex flex-col items-center gap-6">

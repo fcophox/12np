@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 export interface Producto {
   id: string;
@@ -18,51 +19,188 @@ export interface Producto {
 
 interface ProductosContextType {
   productos: Producto[];
-  agregarProducto: (p: Producto) => void;
-  eliminarProducto: (id: string) => void;
-  actualizarProducto: (p: Producto) => void;
-  pausarProducto: (id: string) => void;
+  loading: boolean;
+  agregarProducto: (p: Omit<Producto, "id" | "creadoEn">) => Promise<void>;
+  eliminarProducto: (id: string) => Promise<void>;
+  actualizarProducto: (p: Producto) => Promise<void>;
+  pausarProducto: (id: string) => Promise<void>;
+  recargarProductos: () => Promise<void>;
 }
 
 const ProductosContext = createContext<ProductosContextType>({
   productos: [],
-  agregarProducto: () => {},
-  eliminarProducto: () => {},
-  actualizarProducto: () => {},
-  pausarProducto: () => {},
+  loading: true,
+  agregarProducto: async () => {},
+  eliminarProducto: async () => {},
+  actualizarProducto: async () => {},
+  pausarProducto: async () => {},
+  recargarProductos: async () => {},
 });
 
 export function ProductosProvider({ children }: { children: ReactNode }) {
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  const loadProductos = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("productos")
+        .select("*")
+        .order("orden", { ascending: true });
+
+      if (error) throw error;
+      
+      const mapped = (data || []).map(p => ({
+        id: p.id,
+        nombre: p.nombre,
+        frase: p.frase,
+        etiqueta: p.etiqueta,
+        etiquetas: p.etiquetas || [],
+        orden: p.orden,
+        precio: p.precio,
+        destacado: p.destacado,
+        pausado: p.pausado,
+        imagen: p.imagen,
+        creadoEn: p.created_at
+      }));
+
+      setProductos(mapped);
+    } catch (error) {
+      console.error("Error loading products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const stored = localStorage.getItem("productos");
-    if (stored) setProductos(JSON.parse(stored));
+    loadProductos();
   }, []);
 
-  const save = (next: Producto[]) => {
-    localStorage.setItem("productos", JSON.stringify(next));
-    return next;
+  const agregarProducto = async (p: Omit<Producto, "id" | "creadoEn">) => {
+    // 1. Fetch current products to calculate new positions
+    const { data: actuales } = await supabase
+      .from("productos")
+      .select("*")
+      .order("orden", { ascending: true });
+
+    let lista = actuales || [];
+    
+    // 2. Prepare new product (temporary ID for positioning)
+    const nuevoTemp = { ...p, id: 'temp' };
+    
+    // 3. Insert at desired position
+    const desiredIndex = Math.max(0, p.orden - 1);
+    lista.splice(desiredIndex, 0, nuevoTemp);
+
+    // 4. Calculate all new orders
+    const updates = lista
+      .filter(item => item.id !== 'temp')
+      .map((item, index) => ({
+        ...item,
+        orden: index + 1
+      }));
+
+    // 5. Insert new product and update others
+    const { error: insertError } = await supabase
+      .from("productos")
+      .insert([{ ...p, orden: desiredIndex + 1 }]);
+
+    if (insertError) throw insertError;
+
+    if (updates.length > 0) {
+      const { error: updateError } = await supabase
+        .from("productos")
+        .upsert(updates);
+      if (updateError) console.error("Error updating others:", updateError);
+    }
+
+    await loadProductos();
   };
 
-  const agregarProducto = (p: Producto) => {
-    setProductos((prev) => save([...prev, p].sort((a, b) => a.orden - b.orden)));
+  const eliminarProducto = async (id: string) => {
+    const { error } = await supabase
+      .from("productos")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+    
+    // After delete, normalize orders to close the gap
+    const { data: restantes } = await supabase
+      .from("productos")
+      .select("*")
+      .order("orden", { ascending: true });
+    
+    if (restantes) {
+      const updates = restantes.map((p, i) => ({ ...p, orden: i + 1 }));
+      await supabase.from("productos").upsert(updates);
+    }
+    
+    await loadProductos();
   };
 
-  const eliminarProducto = (id: string) => {
-    setProductos((prev) => save(prev.filter((p) => p.id !== id)));
+  const actualizarProducto = async (p: Producto) => {
+    // 1. Fetch all except the one being updated
+    const { data: actuales } = await supabase
+      .from("productos")
+      .select("*")
+      .neq("id", p.id)
+      .order("orden", { ascending: true });
+
+    let lista = actuales || [];
+    
+    // 2. Insert the updated product at its new desired position
+    const desiredIndex = Math.max(0, p.orden - 1);
+    lista.splice(desiredIndex, 0, p);
+
+    // 3. Normalize all orders
+    const updates = lista.map((item, index) => ({
+      id: item.id,
+      nombre: item.nombre,
+      frase: item.frase,
+      etiqueta: item.etiqueta,
+      etiquetas: item.etiquetas,
+      orden: index + 1,
+      precio: item.precio,
+      destacado: item.destacado,
+      pausado: item.pausado,
+      imagen: item.imagen
+    }));
+
+    // 4. Batch update using upsert
+    const { error } = await supabase
+      .from("productos")
+      .upsert(updates);
+
+    if (error) throw error;
+    await loadProductos();
   };
 
-  const actualizarProducto = (p: Producto) => {
-    setProductos((prev) => save(prev.map((x) => x.id === p.id ? p : x).sort((a, b) => a.orden - b.orden)));
-  };
+  const pausarProducto = async (id: string) => {
+    const p = productos.find(x => x.id === id);
+    if (!p) return;
 
-  const pausarProducto = (id: string) => {
-    setProductos((prev) => save(prev.map((x) => x.id === id ? { ...x, pausado: !x.pausado } : x)));
+    const { error } = await supabase
+      .from("productos")
+      .update({ pausado: !p.pausado })
+      .eq("id", id);
+
+    if (error) throw error;
+    setProductos(prev => prev.map(x => x.id === id ? { ...x, pausado: !x.pausado } : x));
   };
 
   return (
-    <ProductosContext.Provider value={{ productos, agregarProducto, eliminarProducto, actualizarProducto, pausarProducto }}>
+    <ProductosContext.Provider value={{ 
+      productos, 
+      loading, 
+      agregarProducto, 
+      eliminarProducto, 
+      actualizarProducto, 
+      pausarProducto,
+      recargarProductos: loadProductos 
+    }}>
       {children}
     </ProductosContext.Provider>
   );

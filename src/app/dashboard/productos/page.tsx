@@ -23,6 +23,7 @@ function Dropdown({
   pausado: boolean;
 }) {
   const [pos, setPos] = useState({ top: 0, left: 0 });
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (anchorRef.current) {
@@ -31,7 +32,13 @@ function Dropdown({
     }
 
     const handler = (e: MouseEvent) => {
-      if (anchorRef.current && !anchorRef.current.contains(e.target as Node)) onClose();
+      if (
+        anchorRef.current && anchorRef.current.contains(e.target as Node) ||
+        contentRef.current && contentRef.current.contains(e.target as Node)
+      ) {
+        return;
+      }
+      onClose();
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -39,6 +46,7 @@ function Dropdown({
 
   return createPortal(
     <div
+      ref={contentRef}
       style={{ top: pos.top, left: pos.left }}
       className="fixed z-[9999] bg-white border border-[#e8e3dd] rounded-lg shadow-xl py-1 min-w-[150px]"
     >
@@ -64,6 +72,59 @@ function Dropdown({
         <Trash2 size={13} />
         Eliminar
       </button>
+    </div>,
+    document.body
+  );
+}
+
+function DeleteModal({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  isDeleting 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onConfirm: () => void;
+  isDeleting: boolean;
+}) {
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+      <div 
+        className="absolute inset-0 bg-[#3d332e]/40 backdrop-blur-sm transition-opacity" 
+        onClick={onClose}
+      />
+      <div className="relative bg-white rounded-2xl shadow-2xl border border-[#e8e3dd] w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
+        <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center mb-5">
+          <Trash2 className="text-red-500" size={24} />
+        </div>
+        <h3 className="text-xl font-bold text-[#3d332e] mb-2">
+          ¿Eliminar producto?
+        </h3>
+        <p className="text-sm text-[#3d332e]/60 mb-8 leading-relaxed">
+          Esta acción no se puede deshacer. El producto desaparecerá de tu catálogo permanentemente.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            disabled={isDeleting}
+            className="flex-1 px-4 py-2.5 rounded-lg border border-[#e8e3dd] text-sm font-semibold text-[#3d332e]/60 hover:bg-[#f9f4e8] transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="flex-1 px-4 py-2.5 rounded-lg bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isDeleting ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : "Eliminar"}
+          </button>
+        </div>
+      </div>
     </div>,
     document.body
   );
@@ -162,18 +223,56 @@ function ProductCard({
 }
 
 export default function ProductosPage() {
-  const { productos, eliminarProducto, pausarProducto } = useProductos();
+  const { productos, loading, eliminarProducto, pausarProducto } = useProductos();
+  const [productoAEliminar, setProductoAEliminar] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleEliminarClick = (id: string) => {
+    setProductoAEliminar(id);
+  };
+
+  const confirmEliminar = async () => {
+    if (!productoAEliminar) return;
+    setIsDeleting(true);
+    try {
+      await eliminarProducto(productoAEliminar);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDeleting(false);
+      setProductoAEliminar(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-5 md:p-10 max-w-5xl animate-pulse">
+        <div className="flex justify-between mb-10">
+          <div className="space-y-3">
+            <div className="h-10 w-48 bg-[#3d332e]/5 rounded-lg" />
+            <div className="h-4 w-80 bg-[#3d332e]/5 rounded-lg" />
+          </div>
+          <div className="h-11 w-36 bg-[#3d332e]/5 rounded-lg" />
+        </div>
+        <div className="bg-white rounded-xl border border-[#e8e3dd] overflow-hidden">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="h-16 border-b border-[#e8e3dd] last:border-0" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-10 max-w-5xl">
-      <div className="flex items-center justify-between mb-10">
-        <div>
+    <div className="p-5 md:p-10 max-w-5xl pb-36 md:pb-10">
+      <div className="flex items-start justify-between mb-8 md:mb-10 gap-4">
+        <div className="hidden md:block">
           <h1 className="text-4xl font-bold text-[#3d332e] mb-2">Productos</h1>
           <p className="text-[#3d332e]/60 text-base">Administra el catálogo de productos de tu plataforma.</p>
         </div>
         <Link
           href="/dashboard/productos/nuevo"
-          className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
+          className="hidden md:flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
         >
           <Plus size={16} />
           Nuevo producto
@@ -209,10 +308,28 @@ export default function ProductosPage() {
             <div className="w-8 shrink-0" />
           </div>
           {productos.map((p) => (
-            <ProductCard key={p.id} p={p} onEliminar={eliminarProducto} onPausar={pausarProducto} />
+            <ProductCard key={p.id} p={p} onEliminar={handleEliminarClick} onPausar={pausarProducto} />
           ))}
         </div>
       )}
+
+      {/* Mobile fixed bottom action bar */}
+      <div className="fixed bottom-16 left-0 right-0 z-30 md:hidden bg-white border-t border-[#e8e3dd] px-5 py-4">
+        <Link
+          href="/dashboard/productos/nuevo"
+          className="w-full flex items-center justify-center gap-2 bg-[#3d332e] text-[#fdfbf7] text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
+        >
+          <Plus size={16} />
+          Nuevo producto
+        </Link>
+      </div>
+
+      <DeleteModal
+        isOpen={!!productoAEliminar}
+        onClose={() => setProductoAEliminar(null)}
+        onConfirm={confirmEliminar}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

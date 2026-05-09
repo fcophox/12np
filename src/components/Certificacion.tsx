@@ -11,16 +11,16 @@ export default function Certificacion() {
         {/* Header Section */}
         <BlurFadeIn className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-20">
           <div className="md:col-span-8 space-y-6">
-            <span className="text-gray-400 text-[10px] font-bold tracking-[0.3em] uppercase">Nuestra Excelencia</span>
-            <h2 className="text-4xl md:text-6xl font-bold font-[family-name:var(--font-fraunces)] leading-tight text-[#1a1a1a]">
+            <span className="text-[#f15a24] text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase">Nuestra Excelencia</span>
+            <h2 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] leading-[1.15] text-[#1a1a1a] tracking-tight">
               Impulsados por la técnica
             </h2>
-          </div>
-          <div className="md:col-span-4 flex items-end md:pb-4">
-            <p className="text-gray-500 text-sm md:text-base leading-relaxed font-medium max-w-[280px]">
-              En 12enpunto, creemos que la pastelería excepcional nace de un equilibrio perfecto entre la precisión técnica y la creatividad sin límites.
+             <p className="text-[clamp(0.8rem,2vw,1rem)] text-gray-500 leading-relaxed font-medium max-w-[600px]">
+              Creemos que la pastelería excepcional nace de un equilibrio perfecto entre la precisión técnica y la creatividad sin límites.
             </p>
+
           </div>
+          
         </BlurFadeIn>
 
         {/* Grid Content */}
@@ -36,7 +36,7 @@ export default function Certificacion() {
           </BlurFadeIn>
 
           {/* Right: Feature Cards */}
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
+          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 grid-rows-2 gap-8 h-full">
             <FeatureCard
               icon={<Lightbulb className="w-8 h-8" strokeWidth={1.5} />}
               title="Técnica con Propósito"
@@ -46,7 +46,7 @@ export default function Certificacion() {
             <FeatureCard
               icon={<Palette className="w-8 h-8" strokeWidth={1.5} />}
               title="Creatividad con Claridad"
-              description="Diseñamos cada postre con una visión clara, uniendo estética, texturas y sabores que inspiran."
+              description="Diseñamos cada postre con una visión clara, uniendo estética, texturas y sabores que inspiran y que llenan el corazón."
               delay={0.3}
             />
             <FeatureCard
@@ -77,16 +77,16 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon, title, description, delay }: FeatureCardProps) {
   return (
-    <BlurFadeIn delay={delay}>
-      <div className="bg-white p-12 md:p-14 rounded-[3rem] border border-black/5 flex flex-col justify-between items-start min-h-[320px] shadow-sm hover:shadow-xl transition-all duration-500 group">
+    <BlurFadeIn delay={delay} className="h-full">
+      <div className="bg-white p-10 rounded-[3rem] border border-black/5 flex flex-col justify-between items-start h-full shadow-sm hover:shadow-xl transition-all duration-500 group">
         <div className="w-12 h-12 flex items-center justify-center text-[#1a1a1a] mb-8 group-hover:scale-110 group-hover:text-[#f15a24] transition-all duration-300">
           {icon}
         </div>
         <div>
-          <h3 className="text-2xl font-bold text-[#1a1a1a] mb-4 font-[family-name:var(--font-fraunces)]">
+          <h3 className="text-[clamp(1.1rem,2.5vw,1.4rem)] font-bold text-[#1a1a1a] mb-4 font-[family-name:var(--font-fraunces)]">
             {title}
           </h3>
-          <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-[280px]">
+          <p className="text-[clamp(0.85rem,1.5vw,1rem)] text-gray-500 leading-relaxed max-w-[280px]">
             {description}
           </p>
         </div>
