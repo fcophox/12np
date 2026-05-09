@@ -74,6 +74,7 @@ export default function DashboardShell({ children, userEmail, userName: initialU
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   return (
     <BrandProvider>
@@ -84,6 +85,8 @@ export default function DashboardShell({ children, userEmail, userName: initialU
         setCollapsed={setCollapsed}
         userEmail={userEmail}
         initialUserName={initialUserName}
+        showMobileMenu={showMobileMenu}
+        setShowMobileMenu={setShowMobileMenu}
       >
         {children}
       </DashboardContent>
@@ -94,11 +97,13 @@ export default function DashboardShell({ children, userEmail, userName: initialU
 interface DashboardContentProps {
   children: React.ReactNode;
   pathname: string;
-  router: any; // Next.js router type is complex, but better than 'any' if possible. Actually, useRouter returns AppRouterInstance.
+  router: any;
   collapsed: boolean;
   setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   userEmail: string;
   initialUserName: string;
+  showMobileMenu: boolean;
+  setShowMobileMenu: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function DashboardContent({ 
@@ -108,7 +113,9 @@ function DashboardContent({
   collapsed, 
   setCollapsed, 
   userEmail, 
-  initialUserName 
+  initialUserName,
+  showMobileMenu,
+  setShowMobileMenu
 }: DashboardContentProps) {
   const { brand } = useBrand();
   
@@ -278,10 +285,43 @@ function DashboardContent({
             {title}
           </p>
 
-          {/* Right: settings icon */}
-          <button className="w-8 h-8 flex items-center justify-center text-[#3d332e]/40 hover:text-[#3d332e] transition-colors">
-            <Settings size={18} />
-          </button>
+          {/* Right: settings icon with dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className={`w-8 h-8 flex items-center justify-center transition-colors ${showMobileMenu ? 'text-[#f15a24]' : 'text-[#3d332e]/40'}`}
+            >
+              <Settings size={18} />
+            </button>
+
+            {showMobileMenu && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40 bg-black/5" 
+                  onClick={() => setShowMobileMenu(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl border border-[#e8e3dd] shadow-xl z-50 overflow-hidden animate-fade-in-up [animation-duration:200ms]">
+                  <Link 
+                    href="https://12enpunto.com/cotizar" 
+                    target="_blank"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#3d332e] hover:bg-[#f9f4e8] transition-colors"
+                  >
+                    <ClipboardList size={16} className="text-[#f15a24]" />
+                    <span>Cotizar</span>
+                  </Link>
+                  <Link 
+                    href="/dashboard/cotizaciones" 
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#3d332e] hover:bg-[#f9f4e8] transition-colors border-t border-[#f5f5f5]"
+                  >
+                    <ClipboardList size={16} className="text-[#3d332e]/40" />
+                    <span>Cotizaciones</span>
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="flex-1 w-full max-w-5xl mx-auto">
