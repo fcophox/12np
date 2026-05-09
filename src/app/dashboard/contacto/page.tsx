@@ -1,6 +1,7 @@
 "use client";
 
 import { useContactos, Contacto } from "@/context/ContactosContext";
+import { sendReplyEmail } from "@/app/actions/emailActions";
 import { 
   Inbox, 
   MessageSquare, 
@@ -13,7 +14,8 @@ import {
   X,
   Send,
   User,
-  Calendar
+  Calendar,
+  Loader2
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,7 +42,46 @@ function ContactoDrawer({
   onClose: () => void;
   onToggleLeido: (id: string, leido: boolean) => void;
 }) {
+  const [isReplying, setIsReplying] = useState(false);
+  const [replySubject, setReplySubject] = useState(`Re: Tu mensaje en 12enpunto — ${contacto.nombre}`);
+  const [replyMessage, setReplyMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+
   if (!contacto) return null;
+
+  const handleSendReply = async () => {
+    if (!replyMessage.trim()) {
+      toast.error("Escribe un mensaje antes de enviar");
+      return;
+    }
+    setIsSending(true);
+    try {
+      const result = await sendReplyEmail({
+        to: contacto.email,
+        toName: contacto.nombre.split(' ')[0],
+        subject: replySubject,
+        mensaje: replyMessage,
+        tipo: 'contacto'
+      });
+      if (result.success) {
+        toast.success(`Respuesta enviada a ${contacto.nombre}`);
+        setIsReplying(false);
+        setReplyMessage('');
+        // Marcar como leído automáticamente
+        if (!contacto.leido) {
+          onToggleLeido(contacto.id, true);
+        }
+      } else {
+        toast.error("Error al enviar la respuesta");
+        console.error(result.error);
+      }
+    } catch (err) {
+      toast.error("Error inesperado al enviar");
+      console.error(err);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex justify-end">
@@ -68,12 +109,14 @@ function ContactoDrawer({
               <User size={20} />
             </div>
             <div>
-              <h3 className="font-bold text-[#3d332e]">Detalle del Contacto</h3>
-              <p className="text-[10px] text-[#3d332e]/40 uppercase font-bold tracking-widest">Prospecto Web</p>
+              <h3 className="font-bold text-[#3d332e]">{isReplying ? 'Responder' : 'Detalle del Contacto'}</h3>
+              <p className="text-[10px] text-[#3d332e]/40 uppercase font-bold tracking-widest">
+                {isReplying ? contacto.email : 'Prospecto Web'}
+              </p>
             </div>
           </div>
           <button 
-            onClick={onClose}
+            onClick={() => isReplying ? setIsReplying(false) : onClose()}
             className="p-2 hover:bg-[#f9f4e8] rounded-full transition-colors text-[#3d332e]/40"
           >
             <X size={20} />
@@ -82,75 +125,132 @@ function ContactoDrawer({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-8 space-y-8">
-          {/* User Info Card */}
-          <div className="space-y-6">
-             <div className="flex flex-col gap-1">
-               <span className="text-[10px] font-bold text-[#3d332e]/30 uppercase tracking-[0.2em]">Nombre</span>
-               <p className="text-xl font-bold text-[#3d332e] font-[family-name:var(--font-fraunces)]">{contacto.nombre}</p>
-             </div>
+          <AnimatePresence mode="wait">
+            {!isReplying ? (
+              <motion.div key="detail" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-8">
+                {/* User Info Card */}
+                <div className="space-y-6">
+                   <div className="flex flex-col gap-1">
+                     <span className="text-[10px] font-bold text-[#3d332e]/30 uppercase tracking-[0.2em]">Nombre</span>
+                     <p className="text-xl font-bold text-[#3d332e] font-[family-name:var(--font-fraunces)]">{contacto.nombre}</p>
+                   </div>
 
-             <div className="grid grid-cols-1 gap-4">
-               <div className="bg-white p-4 rounded-2xl border border-[#e8e3dd] shadow-sm">
-                 <span className="text-[9px] font-bold text-[#3d332e]/30 uppercase tracking-widest block mb-1">Email</span>
-                 <a href={`mailto:${contacto.email}`} className="text-sm font-semibold text-[#f15a24] hover:underline flex items-center gap-2">
-                   <Mail size={14} /> {contacto.email}
-                 </a>
-               </div>
-               <div className="bg-white p-4 rounded-2xl border border-[#e8e3dd] shadow-sm">
-                 <span className="text-[9px] font-bold text-[#3d332e]/30 uppercase tracking-widest block mb-1">WhatsApp</span>
-                 <a href={`https://wa.me/${contacto.whatsapp.replace(/\D/g, '')}`} target="_blank" className="text-sm font-semibold text-[#3d332e] flex items-center gap-2">
-                   <Phone size={14} className="text-[#25D366]" /> {contacto.whatsapp}
-                 </a>
-               </div>
-             </div>
-          </div>
+                   <div className="grid grid-cols-1 gap-4">
+                     <div className="bg-white p-4 rounded-2xl border border-[#e8e3dd] shadow-sm">
+                       <span className="text-[9px] font-bold text-[#3d332e]/30 uppercase tracking-widest block mb-1">Email</span>
+                       <a href={`mailto:${contacto.email}`} className="text-sm font-semibold text-[#f15a24] hover:underline flex items-center gap-2">
+                         <Mail size={14} /> {contacto.email}
+                       </a>
+                     </div>
+                     <div className="bg-white p-4 rounded-2xl border border-[#e8e3dd] shadow-sm">
+                       <span className="text-[9px] font-bold text-[#3d332e]/30 uppercase tracking-widest block mb-1">WhatsApp</span>
+                       <a href={`https://wa.me/${contacto.whatsapp.replace(/\D/g, '')}`} target="_blank" className="text-sm font-semibold text-[#3d332e] flex items-center gap-2">
+                         <Phone size={14} className="text-[#25D366]" /> {contacto.whatsapp}
+                       </a>
+                     </div>
+                   </div>
+                </div>
 
-          {/* Message */}
-          <div className="space-y-3">
-             <span className="text-[10px] font-bold text-[#3d332e]/30 uppercase tracking-[0.2em] flex items-center gap-2">
-               <MessageSquare size={12} /> Mensaje Recibido
-             </span>
-             <div className="bg-white p-6 rounded-[2rem] border border-[#e8e3dd] shadow-sm relative italic leading-relaxed text-[#3d332e]/80 text-sm">
-                &quot;{contacto.mensaje}&quot;
-                <div className="absolute -bottom-2 -left-2 w-8 h-8 bg-white border border-[#e8e3dd] rotate-45 -z-10" />
-             </div>
-          </div>
+                {/* Message */}
+                <div className="space-y-3">
+                   <span className="text-[10px] font-bold text-[#3d332e]/30 uppercase tracking-[0.2em] flex items-center gap-2">
+                     <MessageSquare size={12} /> Mensaje Recibido
+                   </span>
+                   <div className="bg-white p-6 rounded-[2rem] border border-[#e8e3dd] shadow-sm relative italic leading-relaxed text-[#3d332e]/80 text-sm">
+                      &quot;{contacto.mensaje}&quot;
+                      <div className="absolute -bottom-2 -left-2 w-8 h-8 bg-white border border-[#e8e3dd] rotate-45 -z-10" />
+                   </div>
+                </div>
 
-          {/* Metadata */}
-          <div className="pt-6 border-t border-[#e8e3dd] flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[11px] text-[#3d332e]/40 font-medium">
-              <Calendar size={12} />
-              {formatDate(contacto.creadoEn)}
-            </div>
-            <button 
-              onClick={() => onToggleLeido(contacto.id, !contacto.leido)}
-              className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border transition-all ${
-                contacto.leido 
-                ? "border-[#3d332e]/10 text-[#3d332e]/40" 
-                : "border-[#f15a24]/20 bg-[#f15a24]/5 text-[#f15a24]"
-              }`}
-            >
-              {contacto.leido ? "Marcar como no leído" : "Marcar como leído"}
-            </button>
-          </div>
+                {/* Metadata */}
+                <div className="pt-6 border-t border-[#e8e3dd] flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[11px] text-[#3d332e]/40 font-medium">
+                    <Calendar size={12} />
+                    {formatDate(contacto.creadoEn)}
+                  </div>
+                  <button 
+                    onClick={() => onToggleLeido(contacto.id, !contacto.leido)}
+                    className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border transition-all ${
+                      contacto.leido 
+                      ? "border-[#3d332e]/10 text-[#3d332e]/40" 
+                      : "border-[#f15a24]/20 bg-[#f15a24]/5 text-[#f15a24]"
+                    }`}
+                  >
+                    {contacto.leido ? "Marcar como no leído" : "Marcar como leído"}
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div key="reply" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+                {/* Original Message Reference */}
+                <div className="bg-white p-4 rounded-2xl border border-[#e8e3dd] shadow-sm">
+                  <span className="text-[9px] font-bold text-[#3d332e]/30 uppercase tracking-widest block mb-2">Mensaje original de {contacto.nombre}</span>
+                  <p className="text-xs text-[#3d332e]/60 italic line-clamp-3">&quot;{contacto.mensaje}&quot;</p>
+                </div>
+
+                {/* Subject */}
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#3d332e]/40 ml-1">Asunto</label>
+                  <input
+                    type="text"
+                    value={replySubject}
+                    onChange={(e) => setReplySubject(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-[#e8e3dd] rounded-xl focus:outline-none focus:border-[#f15a24] transition-colors text-sm text-[#3d332e]"
+                  />
+                </div>
+
+                {/* Message */}
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#3d332e]/40 ml-1">Tu respuesta</label>
+                  <textarea
+                    value={replyMessage}
+                    onChange={(e) => setReplyMessage(e.target.value)}
+                    placeholder={`Escribe tu respuesta para ${contacto.nombre.split(' ')[0]}...`}
+                    rows={8}
+                    className="w-full px-4 py-3 bg-white border border-[#e8e3dd] rounded-xl focus:outline-none focus:border-[#f15a24] transition-colors text-sm text-[#3d332e] resize-none"
+                  />
+                </div>
+
+                <p className="text-[10px] text-[#3d332e]/30 leading-relaxed">
+                  Se enviará desde <strong>hola@12enpunto.cl</strong> a <strong>{contacto.email}</strong>. El cliente podrá responder a somos12enpunto@gmail.com.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Footer Actions */}
         <div className="p-6 bg-white border-t border-[#e8e3dd] flex gap-3">
-          <a 
-            href={`mailto:${contacto.email}`}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#3d332e] text-white py-4 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-[#2a2220] transition-all shadow-lg shadow-[#3d332e]/10"
-          >
-            <Mail size={16} /> Responder
-          </a>
-          <a 
-            href={`https://wa.me/${contacto.whatsapp.replace(/\D/g, '')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-14 h-14 flex items-center justify-center bg-[#25D366] text-white rounded-2xl hover:bg-[#128C7E] transition-all shadow-lg shadow-[#25D366]/20"
-          >
-            <Phone size={20} />
-          </a>
+          {!isReplying ? (
+            <>
+              <button 
+                onClick={() => setIsReplying(true)}
+                className="flex-1 flex items-center justify-center gap-2 bg-[#3d332e] text-white py-4 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-[#f15a24] transition-all shadow-lg shadow-[#3d332e]/10"
+              >
+                <Send size={16} /> Responder
+              </button>
+              <a 
+                href={`https://wa.me/${contacto.whatsapp.replace(/\D/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-14 h-14 flex items-center justify-center bg-[#25D366] text-white rounded-2xl hover:bg-[#128C7E] transition-all shadow-lg shadow-[#25D366]/20"
+              >
+                <Phone size={20} />
+              </a>
+            </>
+          ) : (
+            <button 
+              onClick={handleSendReply}
+              disabled={isSending || !replyMessage.trim()}
+              className="flex-1 flex items-center justify-center gap-2 bg-[#f15a24] text-white py-4 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-[#3d332e] transition-all shadow-lg shadow-[#f15a24]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSending ? (
+                <><Loader2 size={16} className="animate-spin" /> Enviando...</>
+              ) : (
+                <><Send size={16} /> Enviar Respuesta</>
+              )}
+            </button>
+          )}
         </div>
       </motion.div>
     </div>,
