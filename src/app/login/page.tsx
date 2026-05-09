@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AppImage from "@/components/ui/AppImage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -62,11 +62,12 @@ export default function LoginPage() {
 
           {/* Logo */}
           <div className="mb-10">
-            <Image
+            <AppImage
               src="/images/brand/12np-h.svg"
               alt="12np logo"
               width={120}
               height={40}
+              variant="fixed"
               priority
             />
           </div>
@@ -172,10 +173,10 @@ export default function LoginPage() {
 
       {/* Right Panel - Image */}
       <div className="hidden md:flex flex-1 relative overflow-hidden">
-        <Image
+        <AppImage
           src="/images/brand/background.png"
           alt="12np background"
-          fill
+          variant="fill"
           className="object-cover"
           priority
         />

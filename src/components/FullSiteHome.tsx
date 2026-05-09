@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AppImage from "@/components/ui/AppImage";
 import { ChevronLeft, ChevronRight, Calendar, ArrowUpRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -109,7 +109,7 @@ function ProductsSection() {
               data-index={i}
               className="product-item relative w-full aspect-square rounded-[3rem] overflow-hidden shadow-2xl shadow-black/5"
             >
-              <Image src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} fill sizes="(max-width: 768px) 100vw, 500px" className="object-cover" />
+              <AppImage src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} variant="fill" sizes="(max-width: 768px) 100vw, 500px" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent md:hidden" />
               <div className="absolute bottom-0 left-0 right-0 p-8 text-white md:hidden scale-90 origin-bottom-left">
                 <h3 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] mb-2 leading-none">{product.nombre}</h3>
@@ -214,7 +214,7 @@ function NewsCarousel() {
                 style={{ transform: `rotate(${rot}deg)`, transformOrigin: 'center center' }}
               >
                 <div className={`relative ${item.aspect} rounded-[2.5rem] overflow-hidden mb-6`}>
-                  <Image src={item.src} alt={item.alt} fill draggable={false} className="object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none select-none" />
+                  <AppImage src={item.src} alt={item.alt} variant="fill" draggable={false} className="object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none select-none" />
                 </div>
               </div>
             );
@@ -297,7 +297,7 @@ function BlogSection() {
         {featuredPost && (
           <Link href={`/blog/${featuredPost.slug}`} className="lg:col-span-2 space-y-6 group cursor-pointer block">
             <div className="relative aspect-[21/9] w-full rounded-[2.5rem] overflow-hidden shadow-2xl">
-              <Image src={featuredPost.cover_url || "/images/blog/featured.png"} alt={featuredPost.titulo} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <AppImage src={featuredPost.cover_url || "/images/blog/featured.png"} alt={featuredPost.titulo} variant="fill" className="object-cover transition-transform duration-700 group-hover:scale-105" />
               {featuredPost.categoria && (
                 <div className="absolute top-6 left-6 px-4 py-1.5 bg-[#f15a24] text-white text-xs font-bold rounded-full uppercase tracking-widest">{featuredPost.categoria}</div>
               )}
@@ -318,7 +318,7 @@ function BlogSection() {
           {recentPosts.map((post) => (
             <Link key={post.id} href={`/blog/${post.slug}`} className="flex gap-6 group cursor-pointer items-start">
               <div className="relative w-32 h-32 md:w-36 md:h-24 flex-shrink-0 rounded-3xl overflow-hidden shadow-lg">
-                <Image src={post.cover_url || "/images/blog/post-1.png"} alt={post.titulo} fill className="object-cover transition-transform group-hover:scale-110" />
+                <AppImage src={post.cover_url || "/images/blog/post-1.png"} alt={post.titulo} variant="fill" className="object-cover transition-transform group-hover:scale-110" />
               </div>
               <div className="space-y-3 pt-1">
                 {post.categoria && (

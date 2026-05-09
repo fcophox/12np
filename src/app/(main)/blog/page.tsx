@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AppImage from "@/components/ui/AppImage";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -85,10 +85,10 @@ export default function BlogPage() {
                 >
                   <Link href={`/blog/${article.slug}`} className="relative aspect-[16/10] overflow-hidden block">
                     {article.cover_url ? (
-                      <Image
+                      <AppImage
                         src={article.cover_url}
                         alt={article.titulo}
-                        fill
+                        variant="fill"
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                     ) : (

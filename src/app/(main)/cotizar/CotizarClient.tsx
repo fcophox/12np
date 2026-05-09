@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronLeft, CheckCircle2, Building2, Package, Send, Cookie, ClipboardList, Pencil } from "lucide-react";
-import Image from "next/image";
+import AppImage from "@/components/ui/AppImage";
 import { createClient } from "@/utils/supabase/client";
 
 const FALLBACK_PRODUCTS = [
@@ -127,10 +127,10 @@ export default function CotizarClient() {
       <div className="min-h-screen bg-[#fdfbf7] flex items-center justify-center px-8 relative overflow-hidden">
         {/* Background Image Top Half */}
         <div className="absolute top-0 left-0 w-full h-[50vh] z-0">
-          <Image
+          <AppImage
             src="/images/brand/background.png"
             alt="Success Background"
-            fill
+            variant="fill"
             className="object-cover"
             priority
           />
@@ -244,10 +244,10 @@ export default function CotizarClient() {
                             }`}
                         >
                           <div className="aspect-square relative">
-                            <Image
+                            <AppImage
                               src={p.imagen || "/images/products/products1.webp"}
                               alt={p.nombre}
-                              fill
+                              variant="fill"
                               className={`object-cover transition-transform duration-500 group-hover:scale-110 ${formData.productosSeleccionados.includes(p.id) ? 'opacity-90' : 'opacity-100'
                                 }`}
                             />
@@ -291,7 +291,7 @@ export default function CotizarClient() {
                             <div key={id} className="flex items-center justify-between p-4 bg-[#fdfbf7] rounded-2xl border border-[#3d332e]/5 group hover:border-[#f15a24]/30 transition-colors">
                               <div className="flex items-center gap-4">
                                 <div className="relative w-16 h-16 rounded-xl overflow-hidden shadow-sm">
-                                  <Image src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} fill className="object-cover" />
+                                  <AppImage src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} variant="fill" className="object-cover" />
                                 </div>
                                 <div>
                                   <h4 className="text-sm font-bold text-[#3d332e] uppercase tracking-tight">{product.nombre}</h4>
@@ -441,7 +441,7 @@ export default function CotizarClient() {
                               <div key={id} className="flex items-center justify-between px-4 py-3 bg-[#fdfbf7]">
                                 <div className="flex items-center gap-3">
                                   <div className="relative w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                                    <Image src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} fill className="object-cover" />
+                                    <AppImage src={product.imagen || "/images/products/products1.webp"} alt={product.nombre} variant="fill" className="object-cover" />
                                   </div>
                                   <span className="text-sm font-bold text-[#3d332e]">{product.nombre}</span>
                                 </div>

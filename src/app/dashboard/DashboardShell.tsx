@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AppImage from "@/components/ui/AppImage";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -111,7 +111,7 @@ function DashboardContent({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatar} alt="Logo" className="w-full h-full object-cover" />
               ) : (
-                <Image src="/images/brand/12np-v.svg" alt="12np" width={18} height={18} style={{ height: 'auto' }} />
+                <AppImage src="/images/brand/12np-v.svg" alt="12np" width={18} height={18} variant="fixed" />
               )}
             </div>
             {!collapsed && (
@@ -204,7 +204,7 @@ function DashboardContent({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatar} alt="Logo" className="w-full h-full object-cover" />
               ) : (
-                <Image src="/images/brand/12np-v.svg" alt="12np" width={16} height={16} style={{ height: 'auto' }} />
+                <AppImage src="/images/brand/12np-v.svg" alt="12np" width={16} height={16} variant="fixed" />
               )}
             </div>
           ) : (

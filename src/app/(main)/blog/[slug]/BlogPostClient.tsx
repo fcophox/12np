@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AppImage from "@/components/ui/AppImage";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
@@ -109,7 +109,7 @@ export default function BlogPostClient({ post }: { post: any }) {
             <div className="flex items-center gap-3">
               <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100">
                 {authorProfile?.avatar_url || post.autor_url ? (
-                  <Image src={authorProfile?.avatar_url || post.autor_url} alt={authorProfile?.full_name || post.autor_nombre} fill className="object-cover" />
+                  <AppImage src={authorProfile?.avatar_url || post.autor_url} alt={authorProfile?.full_name || post.autor_nombre} variant="fill" className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300">
                     <User size={20} />
@@ -142,10 +142,10 @@ export default function BlogPostClient({ post }: { post: any }) {
         <section className="w-full px-8 md:px-16 pb-16">
           <div className="max-w-5xl mx-auto">
             <div className="relative aspect-[16/9] md:aspect-[21/9] rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl shadow-orange-900/5">
-              <Image 
+              <AppImage 
                 src={post.cover_url} 
                 alt={post.titulo} 
-                fill 
+                variant="fill" 
                 className="object-cover"
                 priority
               />
@@ -181,7 +181,7 @@ export default function BlogPostClient({ post }: { post: any }) {
           <div className="mt-20 p-8 md:p-10 bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-200/20 flex flex-col md:flex-row gap-8 items-start">
             <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden flex-shrink-0 bg-gray-50 ring-4 ring-white shadow-lg">
               {authorProfile?.avatar_url || post.autor_url ? (
-                <Image src={authorProfile?.avatar_url || post.autor_url} alt={authorProfile?.full_name || post.autor_nombre} fill className="object-cover" />
+                <AppImage src={authorProfile?.avatar_url || post.autor_url} alt={authorProfile?.full_name || post.autor_nombre} variant="fill" className="object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-300">
                   <User size={40} />

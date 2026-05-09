@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AppImage from "@/components/ui/AppImage";
 import { Utensils, ShoppingBag } from "lucide-react";
 import B2BBanner from "@/components/B2BBanner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -108,10 +108,10 @@ export default function LaCartaClient() {
                 >
                   <div className="relative aspect-square overflow-hidden bg-[#f9f4e8]">
                     {product.imagen ? (
-                      <Image
+                      <AppImage
                         src={product.imagen}
                         alt={product.nombre}
-                        fill
+                        variant="fill"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
