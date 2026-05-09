@@ -14,6 +14,7 @@ import {
   ChevronLeft as BackIcon,
   Settings,
   MessageSquare,
+  ClipboardList,
 } from "lucide-react";
 import { ArticulosProvider } from "@/context/ArticulosContext";
 import { ProductosProvider } from "@/context/ProductosContext";
@@ -26,6 +27,7 @@ const navItems = [
   { label: "Artículos", href: "/dashboard/articulos", icon: FileText },
   { label: "Productos", href: "/dashboard/productos", icon: Layers },
   { label: "Contacto", href: "/dashboard/contacto", icon: MessageSquare },
+  { label: "Cotizaciones", href: "/dashboard/cotizaciones", icon: ClipboardList },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -34,6 +36,7 @@ const pageTitles: Record<string, string> = {
   "/dashboard/articulos": "Artículos",
   "/dashboard/productos": "Productos",
   "/dashboard/contacto": "Contacto",
+  "/dashboard/cotizaciones": "Cotizaciones",
   "/dashboard/articulos/nuevo": "Nuevo artículo",
   "/dashboard/productos/nuevo": "Nuevo producto",
 };
@@ -47,7 +50,7 @@ function getMobileTitle(pathname: string): string {
 }
 
 function isRootSection(pathname: string): boolean {
-  return Object.keys(pageTitles).slice(0, 5).includes(pathname);
+  return Object.keys(pageTitles).slice(0, 6).includes(pathname);
 }
 
 interface DashboardShellProps {
