@@ -27,7 +27,7 @@ import { logout } from "@/app/login/actions";
 
 const primaryNavItems = [
   { label: "Inicio", href: "/dashboard", icon: Home },
-  { label: "Brand", href: "/dashboard/brand", icon: Palette },
+  { label: "Perfil", href: "/dashboard/perfil", icon: Palette },
   { label: "Galería", href: "/dashboard/galeria", icon: ImageIcon },
   { label: "Productos", href: "/dashboard/productos", icon: Layers },
   { label: "Artículos", href: "/dashboard/articulos", icon: FileText },
@@ -42,7 +42,7 @@ const navItems = [...primaryNavItems, ...secondaryNavItems];
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Inicio",
-  "/dashboard/brand": "Brand",
+  "/dashboard/perfil": "Perfil",
   "/dashboard/galeria": "Galería",
   "/dashboard/productos": "Productos",
   "/dashboard/articulos": "Artículos",

@@ -83,7 +83,7 @@ export default function DashboardPage() {
       initials: brand.nombre?.[0] || "U",
       name: displayName,
       action: "ha actualizado el perfil de",
-      target: "Brand Identity",
+      target: "Perfil",
       time: "Recientemente",
     },
     {

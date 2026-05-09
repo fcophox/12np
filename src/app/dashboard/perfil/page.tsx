@@ -5,7 +5,7 @@ import { ImagePlus, Save } from "lucide-react";
 import { useBrand } from "@/context/BrandContext";
 import { toast } from "sonner";
 
-export default function BrandPage() {
+export default function PerfilPage() {
   const { brand, loading, actualizarBrand } = useBrand();
 
   const [nombre, setNombre] = useState("");
@@ -64,8 +64,8 @@ export default function BrandPage() {
     <div className="p-5 md:p-10 pb-36 md:pb-10">
       <div className="flex items-start justify-between mb-8 gap-4">
         <div className="hidden md:block">
-          <h1 className="text-xl font-bold text-[#3d332e] mb-2">Brand</h1>
-          <p className="text-[#3d332e]/60 text-base">Configura la identidad de tu marca.</p>
+          <h1 className="text-xl font-bold text-[#3d332e] mb-2">Perfil</h1>
+          <p className="text-[#3d332e]/60 text-base">Configura tu información personal y profesional.</p>
         </div>
         {/* Desktop button */}
         <button
