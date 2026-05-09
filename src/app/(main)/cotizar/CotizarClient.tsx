@@ -111,6 +111,23 @@ export default function CotizarClient() {
     });
   };
 
+  const resetForm = () => {
+    setFormData({
+      productosSeleccionados: [],
+      cantidades: {},
+      productosPersonalizados: "",
+      empresa: "",
+      contacto: "",
+      email: "",
+      tel: "",
+      fecha: "",
+      direccion: "",
+      comentarios: "",
+    });
+    setStep(1);
+    setIsSubmitted(false);
+  };
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,45 +172,6 @@ export default function CotizarClient() {
     { id: 4, title: "Revisión", icon: ClipboardList },
   ];
 
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-[#fdfbf7] flex items-center justify-center px-8 relative overflow-hidden">
-        {/* Background Image Top Half */}
-        <div className="absolute top-0 left-0 w-full h-[50vh] z-0">
-          <Image
-            src="/images/brand/background.png"
-            alt="Success Background"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#fdfbf7]" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="max-w-md w-full bg-white rounded-[3rem] p-12 text-center space-y-8 shadow-2xl shadow-black/10 border border-[#3d332e]/5 relative z-10"
-        >
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center text-green-600 mx-auto shadow-inner">
-            <CheckCircle2 size={40} />
-          </div>
-          <div className="space-y-4">
-            <h2 className="text-3xl font-bold font-[family-name:var(--font-fraunces)] text-[#1a1a1a]">¡Solicitud Recibida!</h2>
-            <p className="text-gray-500 leading-relaxed">
-              Gracias por interesarte en trabajar con nosotras. Revisaremos tu solicitud de cotización y te contactaremos en menos de 24 horas hábiles.
-            </p>
-          </div>
-          <button
-            onClick={() => window.location.href = '/'}
-            className="w-full py-5 bg-[#3d332e] text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-xs hover:bg-[#f15a24] transition-all duration-300 shadow-lg shadow-[#3d332e]/20"
-          >
-            Volver al Inicio
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#fdfbf7]">
@@ -244,8 +222,41 @@ export default function CotizarClient() {
           {/* Form Container */}
           <div className="bg-white rounded-[3rem] p-8 md:p-16 pt-16 md:pt-24 shadow-2xl shadow-black/[0.03] border border-[#3d332e]/5 relative overflow-hidden z-10">
           <AnimatePresence mode="wait">
-            <motion.form
-              key={step}
+            {isSubmitted ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="flex flex-col items-center justify-center text-center space-y-8 py-10"
+              >
+                <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center text-green-600 shadow-inner">
+                  <CheckCircle2 size={40} />
+                </div>
+                <div className="space-y-4">
+                  <h2 className="text-3xl font-bold font-[family-name:var(--font-fraunces)] text-[#1a1a1a]">¡Solicitud Recibida!</h2>
+                  <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
+                    Gracias por interesarte en trabajar con nosotras. Revisaremos tu solicitud de cotización y te contactaremos en menos de 24 horas hábiles.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
+                  <button
+                    onClick={resetForm}
+                    className="flex-1 py-4 bg-[#3d332e] text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#f15a24] transition-all duration-300 shadow-lg shadow-[#3d332e]/10"
+                  >
+                    Cotizar nuevamente
+                  </button>
+                  <button
+                    onClick={() => window.location.href = '/'}
+                    className="flex-1 py-4 bg-white text-[#3d332e] border border-[#e8e3dd] rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-gray-50 transition-all duration-300"
+                  >
+                    Volver al Inicio
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.form
+                key={step}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -559,7 +570,8 @@ export default function CotizarClient() {
                   </button>
                 )}
               </div>
-            </motion.form>
+              </motion.form>
+            )}
           </AnimatePresence>
         </div>
       </div>

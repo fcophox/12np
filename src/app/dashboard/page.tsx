@@ -99,7 +99,7 @@ export default function DashboardPage() {
     <div className="p-5 md:p-10 pb-20 md:pb-10">
       {/* Greeting - desktop only */}
       <div className="hidden md:block mb-10">
-        <h1 className="text-4xl font-bold text-[#3d332e] mb-2">
+        <h1 className="text-xl font-bold text-[#3d332e] mb-2">
           Hola, {displayName} 👋
         </h1>
         <p className="text-[#3d332e]/60 text-base leading-relaxed">

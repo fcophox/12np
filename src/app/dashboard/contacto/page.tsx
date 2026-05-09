@@ -263,7 +263,7 @@ export default function ContactoPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-8 md:mb-10 gap-4">
         <div className="hidden md:block">
-          <h1 className="text-4xl font-bold text-[#3d332e] mb-2">
+          <h1 className="text-xl font-bold text-[#3d332e] mb-2">
             Mensajes de Contacto
           </h1>
           <p className="text-[#3d332e]/60 text-base">

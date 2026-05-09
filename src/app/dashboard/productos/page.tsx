@@ -267,7 +267,7 @@ export default function ProductosPage() {
     <div className="p-5 md:p-10 pb-36 md:pb-10">
       <div className="flex items-start justify-between mb-8 md:mb-10 gap-4">
         <div className="hidden md:block">
-          <h1 className="text-4xl font-bold text-[#3d332e] mb-2">Productos</h1>
+          <h1 className="text-xl font-bold text-[#3d332e] mb-2">Productos</h1>
           <p className="text-[#3d332e]/60 text-base">Administra el catálogo de productos de tu plataforma.</p>
         </div>
         <Link

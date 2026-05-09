@@ -64,7 +64,7 @@ export default function BrandPage() {
     <div className="p-5 md:p-10 pb-36 md:pb-10">
       <div className="flex items-start justify-between mb-8 gap-4">
         <div className="hidden md:block">
-          <h1 className="text-4xl font-bold text-[#3d332e] mb-2">Brand</h1>
+          <h1 className="text-xl font-bold text-[#3d332e] mb-2">Brand</h1>
           <p className="text-[#3d332e]/60 text-base">Configura la identidad de tu marca.</p>
         </div>
         {/* Desktop button */}
