@@ -57,7 +57,6 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
 
 
   const loadProductos = useCallback(async () => {
-    setLoading(true);
     try {
       const supabase = createClient();
       const { data, error } = await supabase

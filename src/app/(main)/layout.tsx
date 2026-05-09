@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
 
-const SHOW_COMING_SOON = true;
+const SHOW_COMING_SOON = false;
 
 export default function MainLayout({
   children,
