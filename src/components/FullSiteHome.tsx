@@ -174,7 +174,29 @@ function NewsCarousel() {
   const targetSpeedRef = useRef(0.5);
   const maxSpeed = 0.5;
 
+  const [images, setImages] = useState<any[]>(NEWS_ITEMS);
+
   useEffect(() => {
+    async function loadRecuerdos() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("galeria")
+        .select("url")
+        .eq("categoria", "recuerdos")
+        .order("orden", { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setImages(data.map(img => ({
+          src: img.url,
+          alt: "Recuerdo 12enpunto",
+          width: "w-[280px] md:w-[320px]",
+          label: "",
+          aspect: "aspect-square"
+        })));
+      }
+    }
+    loadRecuerdos();
+
     const track = trackRef.current;
     if (!track) return;
     targetSpeedRef.current = maxSpeed;
@@ -202,7 +224,7 @@ function NewsCarousel() {
       </BlurFadeIn>
       <div className="w-screen -mx-8 md:-mx-16 overflow-hidden">
         <div ref={trackRef} className="flex gap-12 items-center w-max px-[10vw]">
-          {[...NEWS_ITEMS, ...NEWS_ITEMS, ...NEWS_ITEMS, ...NEWS_ITEMS].map((item, i) => {
+          {[...images, ...images, ...images, ...images].map((item, i) => {
             const rotations = [2, -1.5, 1, -2.5, 1.8, -1, 2.2, -1.8, 1.2, -2];
             const rot = rotations[i % rotations.length];
             return (

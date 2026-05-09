@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import BlurFadeIn from "./BlurFadeIn";
 import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 const SLIDER_IMAGES = [
   "/images/brand/heroimagen.png",
@@ -15,10 +16,28 @@ const SLIDER_IMAGES = [
 
 export default function HeroB() {
   const [current, setCurrent] = useState(0);
+  const [images, setImages] = useState<string[]>(SLIDER_IMAGES);
 
   useEffect(() => {
+    async function loadHeroImages() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("galeria")
+        .select("url")
+        .eq("categoria", "hero")
+        .order("orden", { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setImages(data.map(img => img.url));
+      }
+    }
+    loadHeroImages();
+
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % SLIDER_IMAGES.length);
+      setImages(prev => {
+        setCurrent((curr) => (curr + 1) % prev.length);
+        return prev;
+      });
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -42,7 +61,7 @@ export default function HeroB() {
       <div className="relative w-full max-w-7xl mx-auto px-8 md:px-16 h-full flex flex-col md:flex-row items-start md:items-center pb-10 sm:pb-16 md:py-0 z-20 gap-8 md:gap-12">
         {/* Mobile Hero Image Slider */}
         <div className="w-full aspect-[21/9] relative rounded-[2rem] overflow-hidden shadow-2xl md:hidden">
-          {SLIDER_IMAGES.map((src, i) => (
+          {images.map((src, i) => (
             <Image
               key={src}
               src={src}
@@ -94,7 +113,7 @@ export default function HeroB() {
               <path d="M1131 680H13.1621C4.6662 658.311 0 634.701 0 610C0 503.961 85.9613 418 192 418C198.547 418 205.017 418.328 211.395 418.968C211.132 413.011 211 407.021 211 401C211 179.534 390.534 0 612 0H1131V680Z" />
             </clipPath>
           </defs>
-          {SLIDER_IMAGES.map((src, i) => (
+          {images.map((src, i) => (
             <image
               key={src}
               href={src}
@@ -115,7 +134,7 @@ export default function HeroB() {
 
       {/* Vertical slide indicator - Desktop */}
       <div className="absolute right-6 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-2">
-        {SLIDER_IMAGES.map((_, i) => (
+        {images.map((_, i) => (
           <div
             key={i}
             className="relative flex items-center justify-center"
