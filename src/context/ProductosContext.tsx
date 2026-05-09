@@ -98,8 +98,8 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
 
     // 4. Calculate all new orders
     const updates = lista
-      .filter(item => item.id !== 'temp')
-      .map((item, index) => ({
+      .filter((item: any) => item.id !== 'temp')
+      .map((item: any, index: number) => ({
         ...item,
         orden: index + 1
       }));
@@ -137,7 +137,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
       .order("orden", { ascending: true });
     
     if (restantes) {
-      const updates = restantes.map((p, i) => ({ ...p, orden: i + 1 }));
+      const updates = restantes.map((p: any, i: number) => ({ ...p, orden: i + 1 }));
       await supabase.from("productos").upsert(updates);
     }
     
@@ -160,7 +160,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
     lista.splice(desiredIndex, 0, p);
 
     // 3. Normalize all orders
-    const updates = lista.map((item, index) => ({
+    const updates = lista.map((item: any, index: number) => ({
       id: item.id,
       nombre: item.nombre,
       frase: item.frase,
