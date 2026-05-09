@@ -19,6 +19,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { createPortal } from "react-dom";
+import DeleteModal from "@/components/DeleteModal";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("es-CL", {
@@ -233,16 +234,20 @@ function ContactoRow({
 export default function ContactoPage() {
   const { contactos, loading, eliminarContacto, marcarComoLeido } = useContactos();
   const [selectedContacto, setSelectedContacto] = useState<Contacto | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: string | null }>({
+    isOpen: false,
+    id: null,
+  });
 
-  const handleEliminar = async (id: string) => {
-    if (confirm("¿Estás seguro de que quieres eliminar este mensaje?")) {
-      try {
-        await eliminarContacto(id);
-        toast.success("Mensaje eliminado");
-        if (selectedContacto?.id === id) setSelectedContacto(null);
-      } catch (e) {
-        toast.error("Error al eliminar");
-      }
+  const handleEliminar = async () => {
+    if (!deleteModal.id) return;
+    try {
+      await eliminarContacto(deleteModal.id);
+      toast.success("Mensaje eliminado");
+      if (selectedContacto?.id === deleteModal.id) setSelectedContacto(null);
+      setDeleteModal({ isOpen: false, id: null });
+    } catch (e) {
+      toast.error("Error al eliminar");
     }
   };
 
@@ -303,12 +308,11 @@ export default function ContactoPage() {
               <ContactoRow 
                 key={c.id} 
                 c={c} 
-                onEliminar={handleEliminar} 
+                onEliminar={(id) => setDeleteModal({ isOpen: true, id })} 
                 onToggleLeido={marcarComoLeido} 
                 onClick={() => setSelectedContacto(c)}
               />
             ))}
-          </div>
         </div>
       )}
 
@@ -322,6 +326,14 @@ export default function ContactoPage() {
           />
         )}
       </AnimatePresence>
+
+      <DeleteModal 
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, id: null })}
+        onConfirm={handleEliminar}
+        title="¿Eliminar mensaje?"
+        description="Esta acción no se puede deshacer. El mensaje de contacto se borrará permanentemente del sistema."
+      />
     </div>
   );
 }

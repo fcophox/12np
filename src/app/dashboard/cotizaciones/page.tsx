@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import DeleteModal from "@/components/DeleteModal";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("es-CL", {
@@ -277,16 +278,20 @@ function CotizacionRow({
 export default function CotizacionesPage() {
   const { cotizaciones, loading, eliminarCotizacion, marcarComoLeido } = useCotizaciones();
   const [selectedCotizacion, setSelectedCotizacion] = useState<Cotizacion | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: string | null }>({
+    isOpen: false,
+    id: null,
+  });
 
-  const handleEliminar = async (id: string) => {
-    if (confirm("¿Estás seguro de que quieres eliminar esta cotización?")) {
-      try {
-        await eliminarCotizacion(id);
-        toast.success("Cotización eliminada");
-        if (selectedCotizacion?.id === id) setSelectedCotizacion(null);
-      } catch (e) {
-        toast.error("Error al eliminar");
-      }
+  const handleEliminar = async () => {
+    if (!deleteModal.id) return;
+    try {
+      await eliminarCotizacion(deleteModal.id);
+      toast.success("Cotización eliminada");
+      if (selectedCotizacion?.id === deleteModal.id) setSelectedCotizacion(null);
+      setDeleteModal({ isOpen: false, id: null });
+    } catch (e) {
+      toast.error("Error al eliminar");
     }
   };
 
@@ -347,7 +352,7 @@ export default function CotizacionesPage() {
               <CotizacionRow 
                 key={c.id} 
                 c={c} 
-                onEliminar={handleEliminar} 
+                onEliminar={(id) => setDeleteModal({ isOpen: true, id })} 
                 onToggleLeido={marcarComoLeido} 
                 onClick={() => setSelectedCotizacion(c)}
               />
@@ -366,6 +371,14 @@ export default function CotizacionesPage() {
           />
         )}
       </AnimatePresence>
+
+      <DeleteModal 
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, id: null })}
+        onConfirm={handleEliminar}
+        title="¿Eliminar cotización?"
+        description="Esta acción no se puede deshacer. La solicitud de cotización se borrará permanentemente."
+      />
     </div>
   );
 }

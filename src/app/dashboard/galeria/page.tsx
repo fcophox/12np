@@ -16,6 +16,7 @@ import {
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import Image from "next/image";
+import DeleteModal from "@/components/DeleteModal";
 
 type Categoria = "hero" | "recuerdos" | "artesanal";
 
@@ -169,6 +170,10 @@ function GaleriaSection({
 
 export default function GaleriaPage() {
   const { imagenes, loading, agregarImagen, eliminarImagen } = useGaleria();
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: string | null }>({
+    isOpen: false,
+    id: null,
+  });
 
   const handleUpload = async (file: File, categoria: Categoria) => {
     const supabase = createClient();
@@ -190,14 +195,13 @@ export default function GaleriaPage() {
     await agregarImagen(publicUrl, categoria);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("¿Estás seguro de que quieres eliminar esta imagen?")) {
-      try {
-        await eliminarImagen(id);
-        toast.success("Imagen eliminada");
-      } catch (e) {
-        toast.error("Error al eliminar");
-      }
+  const handleDelete = async () => {
+    if (!deleteModal.id) return;
+    try {
+      await eliminarImagen(deleteModal.id);
+      toast.success("Imagen eliminada");
+    } catch (e) {
+      toast.error("Error al eliminar");
     }
   };
 
@@ -235,9 +239,17 @@ export default function GaleriaPage() {
           cat={cat} 
           imagenes={imagenes.filter(img => img.categoria === cat.id)}
           onUpload={handleUpload}
-          onDelete={handleDelete}
+          onDelete={async (id) => setDeleteModal({ isOpen: true, id })}
         />
       ))}
+
+      <DeleteModal 
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, id: null })}
+        onConfirm={handleDelete}
+        title="¿Eliminar imagen?"
+        description="Esta acción no se puede deshacer. La imagen desaparecerá de todas las secciones del sitio donde se encuentre."
+      />
     </div>
   );
 }
