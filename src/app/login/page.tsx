@@ -23,12 +23,10 @@ export default function LoginPage() {
     
     startTransition(async () => {
       try {
-        const result = await login(formData);
-        // Next.js handles the redirect automatically if login doesn't throw
+        await login(formData);
       } catch (err: any) {
-        // If it's a redirect error (standard Next.js behavior), don't show error
         if (err.message === 'NEXT_REDIRECT') return;
-        setError("Credenciales inválidas o error de conexión.");
+        setError(err.message || "Error inesperado al iniciar sesión.");
       }
     });
   };
