@@ -42,6 +42,7 @@ export default function NuevoArticuloPage() {
     if (brand) {
       if (brand.nombre) setAutorNombre(brand.nombre);
       if (brand.avatar) setAutorPreview(brand.avatar);
+      if (brand.cargo) setAutorCargo(brand.cargo);
     }
   }, [brand]);
 

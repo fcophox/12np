@@ -59,7 +59,7 @@ export default function EditarArticuloPage() {
       setDestacado(a.destacado || false);
       setEtiquetas(a.etiquetas);
       setAutorNombre(a.autorNombre || brand.nombre);
-      setAutorCargo(a.autorCargo);
+      setAutorCargo(a.autorCargo || brand.cargo);
       setCoverPreview(a.coverPreview);
       setAutorPreview(a.autorPreview || brand.avatar);
       setCreadoEn(a.creadoEn);
