@@ -2,7 +2,14 @@
 
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) {
+    console.error("RESEND_API_KEY no encontrada en las variables de entorno.");
+    return null;
+  }
+  return new Resend(key);
+}
 
 export async function sendContactEmail(formData: {
   nombre: string;
@@ -10,12 +17,8 @@ export async function sendContactEmail(formData: {
   whatsapp: string;
   mensaje: string;
 }) {
-  console.log("Iniciando envío de correo de contacto...");
-  
-  if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY no encontrada en las variables de entorno.");
-    return { success: false, error: "API Key missing" };
-  }
+  const resend = getResend();
+  if (!resend) return { success: false, error: "API Key missing" };
 
   try {
     const { data, error } = await resend.emails.send({
@@ -68,12 +71,8 @@ export async function sendQuotationEmail(formData: {
   }[];
   detalleAdicional: string;
 }) {
-  console.log("Iniciando envío de correo de cotización...");
-
-  if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY no encontrada.");
-    return { success: false, error: "API Key missing" };
-  }
+  const resend = getResend();
+  if (!resend) return { success: false, error: "API Key missing" };
 
   try {
     const { data, error } = await resend.emails.send({
@@ -143,12 +142,8 @@ export async function sendReplyEmail(formData: {
   mensaje: string;
   tipo: 'contacto' | 'cotizacion';
 }) {
-  console.log("Enviando respuesta a:", formData.to);
-
-  if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY no encontrada.");
-    return { success: false, error: "API Key missing" };
-  }
+  const resend = getResend();
+  if (!resend) return { success: false, error: "API Key missing" };
 
   const accentColor = formData.tipo === 'cotizacion' ? '#74865e' : '#f15a24';
 

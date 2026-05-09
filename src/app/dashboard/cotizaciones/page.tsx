@@ -272,7 +272,7 @@ function CotizacionDrawer({
                   />
                 </div>
 
-                <p className="text-[10px] text-[#3d332e]/30 leading-relaxed">
+                <p className="text-[12px] text-[#3d332e]/30 leading-relaxed">
                   Se enviará desde <strong>hola@12enpunto.cl</strong> a <strong>{cotizacion.email}</strong>. El cliente podrá responder a somos12enpunto@gmail.com.
                 </p>
               </motion.div>
