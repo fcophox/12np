@@ -24,8 +24,8 @@ import { logout } from "@/app/login/actions";
 const navItems = [
   { label: "Inicio", href: "/dashboard", icon: Home },
   { label: "Brand", href: "/dashboard/brand", icon: Palette },
-  { label: "Artículos", href: "/dashboard/articulos", icon: FileText },
   { label: "Productos", href: "/dashboard/productos", icon: Layers },
+  { label: "Artículos", href: "/dashboard/articulos", icon: FileText },
   { label: "Contacto", href: "/dashboard/contacto", icon: MessageSquare },
   { label: "Cotizaciones", href: "/dashboard/cotizaciones", icon: ClipboardList },
 ];
@@ -33,8 +33,8 @@ const navItems = [
 const pageTitles: Record<string, string> = {
   "/dashboard": "Inicio",
   "/dashboard/brand": "Brand",
-  "/dashboard/articulos": "Artículos",
   "/dashboard/productos": "Productos",
+  "/dashboard/articulos": "Artículos",
   "/dashboard/contacto": "Contacto",
   "/dashboard/cotizaciones": "Cotizaciones",
   "/dashboard/articulos/nuevo": "Nuevo artículo",
