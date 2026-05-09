@@ -29,7 +29,7 @@ export default function ContactoClient() {
         .insert([{
           nombre: formData.nombre,
           email: formData.email,
-          whatsapp: formData.whatsapp,
+          whatsapp: `+56 9 ${formData.whatsapp}`,
           mensaje: formData.mensaje,
           leido: false
         }]);
@@ -121,16 +121,19 @@ export default function ContactoClient() {
 
                         <div className="space-y-2">
                           <label htmlFor="whatsapp" className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#3d332e]/40 ml-1">WhatsApp</label>
-                          <input
-                            required
-                            type="tel"
-                            id="whatsapp"
-                            name="whatsapp"
-                            value={formData.whatsapp}
-                            onChange={handleChange}
-                            placeholder="+56 9 ..."
-                            className="w-full px-5 py-4 bg-[#fdfbf7] border border-[#3d332e]/5 rounded-2xl focus:outline-none focus:border-[#f15a24] transition-colors placeholder-[#3d332e]/20 text-[#3d332e]"
-                          />
+                          <div className="relative">
+                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-sm font-bold text-[#3d332e]/30 select-none">+56 9</span>
+                            <input
+                              required
+                              type="tel"
+                              id="whatsapp"
+                              name="whatsapp"
+                              value={formData.whatsapp}
+                              onChange={handleChange}
+                              placeholder="1234 5678"
+                              className="w-full pl-20 pr-5 py-4 bg-[#fdfbf7] border border-[#3d332e]/5 rounded-2xl focus:outline-none focus:border-[#f15a24] transition-colors placeholder-[#3d332e]/20 text-[#3d332e]"
+                            />
+                          </div>
                         </div>
                       </div>
 
