@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 export interface Contacto {
@@ -43,8 +43,8 @@ export function ContactosProvider({ children }: { children: ReactNode }) {
   const [contactos, setContactos] = useState<Contacto[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadContactos = async () => {
-    setLoading(true);
+  const loadContactos = useCallback(async (isInitial = false) => {
+    if (!isInitial) setLoading(true);
     try {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -73,11 +73,11 @@ export function ContactosProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadContactos();
-  }, []);
+    loadContactos(true);
+  }, [loadContactos]);
 
   const eliminarContacto = async (id: string) => {
     const supabase = createClient();
@@ -107,7 +107,7 @@ export function ContactosProvider({ children }: { children: ReactNode }) {
       loading, 
       eliminarContacto, 
       marcarComoLeido,
-      recargarContactos: loadContactos 
+      recargarContactos: () => loadContactos() 
     }}>
       {children}
     </ContactosContext.Provider>

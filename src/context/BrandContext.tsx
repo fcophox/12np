@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 interface BrandData {
@@ -29,38 +29,39 @@ export function BrandProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
 
-  useEffect(() => {
-    const loadBrand = async () => {
-      try {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("full_name, avatar_url, bio, linkedin, correo, cargo")
-            .eq("id", user.id)
-            .single();
+  const loadBrand = useCallback(async (isInitial = false) => {
+    if (!isInitial) setLoading(true);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url, bio, linkedin, correo, cargo")
+          .eq("id", user.id)
+          .single();
 
-          if (data && !error) {
-            setBrand({
-              nombre: data.full_name || "",
-              avatar: data.avatar_url,
-              bio: data.bio || "",
-              linkedin: data.linkedin || "",
-              correo: data.correo || "",
-              cargo: data.cargo || "",
-            });
-          }
+        if (data && !error) {
+          setBrand({
+            nombre: data.full_name || "",
+            avatar: data.avatar_url,
+            bio: data.bio || "",
+            linkedin: data.linkedin || "",
+            correo: data.correo || "",
+            cargo: data.cargo || "",
+          });
         }
-      } catch (error) {
-        console.error("Error loading brand data from Supabase:", error);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    loadBrand();
+    } catch (error) {
+      console.error("Error loading brand data from Supabase:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadBrand(true);
+  }, [loadBrand]);
 
 const actualizarBrand = async (data: BrandData) => {
   try {

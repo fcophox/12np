@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 export interface Cotizacion {
@@ -24,7 +24,10 @@ interface CotizacionDB {
   contacto: string;
   email: string;
   tel: string;
-  productos: any;
+  productos: {
+    seleccionados: string[];
+    cantidades: Record<string, string>;
+  };
   detalle_adicional: string;
   leido: boolean;
   created_at: string;
@@ -50,8 +53,8 @@ export function CotizacionesProvider({ children }: { children: ReactNode }) {
   const [cotizaciones, setCotizaciones] = useState<Cotizacion[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadCotizaciones = async () => {
-    setLoading(true);
+  const loadCotizaciones = useCallback(async (isInitial = false) => {
+    if (!isInitial) setLoading(true);
     try {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -82,11 +85,11 @@ export function CotizacionesProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadCotizaciones();
-  }, []);
+    loadCotizaciones(true);
+  }, [loadCotizaciones]);
 
   const eliminarCotizacion = async (id: string) => {
     const supabase = createClient();
@@ -116,7 +119,7 @@ export function CotizacionesProvider({ children }: { children: ReactNode }) {
       loading, 
       eliminarCotizacion, 
       marcarComoLeido,
-      recargarCotizaciones: loadCotizaciones 
+      recargarCotizaciones: () => loadCotizaciones() 
     }}>
       {children}
     </CotizacionesContext.Provider>

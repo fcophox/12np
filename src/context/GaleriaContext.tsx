@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 export interface GaleriaImagen {
@@ -31,7 +31,8 @@ export function GaleriaProvider({ children }: { children: ReactNode }) {
   const [imagenes, setImagenes] = useState<GaleriaImagen[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadGaleria = async () => {
+  const loadGaleria = useCallback(async (isInitial = false) => {
+    if (!isInitial) setLoading(true);
     try {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -56,11 +57,11 @@ export function GaleriaProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadGaleria();
-  }, []);
+    loadGaleria(true);
+  }, [loadGaleria]);
 
   const agregarImagen = async (url: string, categoria: "hero" | "recuerdos" | "artesanal") => {
     const supabase = createClient();
@@ -109,7 +110,7 @@ export function GaleriaProvider({ children }: { children: ReactNode }) {
       loading, 
       agregarImagen, 
       eliminarImagen,
-      recargarGaleria: loadGaleria 
+      recargarGaleria: () => loadGaleria() 
     }}>
       {children}
     </GaleriaContext.Provider>

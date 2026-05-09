@@ -56,7 +56,8 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
 
-  const loadProductos = useCallback(async () => {
+  const loadProductos = useCallback(async (isInitial = false) => {
+    if (!isInitial) setLoading(true);
     try {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -89,7 +90,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    loadProductos();
+    loadProductos(true);
   }, [loadProductos]);
 
   const agregarProducto = async (p: Omit<Producto, "id" | "creadoEn">) => {
@@ -217,7 +218,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
       eliminarProducto, 
       actualizarProducto, 
       pausarProducto,
-      recargarProductos: loadProductos 
+      recargarProductos: () => loadProductos() 
     }}>
       {children}
     </ProductosContext.Provider>

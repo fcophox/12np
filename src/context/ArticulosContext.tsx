@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 export interface Articulo {
@@ -60,45 +60,45 @@ export function ArticulosProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
 
-  useEffect(() => {
-    const loadArticulos = async () => {
-      setLoading(true);
-      try {
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .from("articulos")
-          .select("*")
-          .order("created_at", { ascending: false });
+  const loadArticulos = useCallback(async (isInitial = false) => {
+    if (!isInitial) setLoading(true);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("articulos")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-        if (error) throw error;
-        
-        const mapped = (data as ArticuloDB[] || []).map((a) => ({
-          id: a.id,
-          titulo: a.titulo,
-          slug: a.slug,
-          descripcion: a.descripcion,
-          contenido: a.contenido,
-          estado: a.estado as Articulo["estado"],
-          categoria: a.categoria,
-          etiquetas: a.etiquetas,
-          autorNombre: a.autor_nombre,
-          autorCargo: a.autor_cargo,
-          coverPreview: a.cover_url,
-          autorPreview: a.autor_url,
-          destacado: a.destacado || false,
-          creadoEn: a.created_at
-        }));
+      if (error) throw error;
+      
+      const mapped = (data as ArticuloDB[] || []).map((a) => ({
+        id: a.id,
+        titulo: a.titulo,
+        slug: a.slug,
+        descripcion: a.descripcion,
+        contenido: a.contenido,
+        estado: a.estado as Articulo["estado"],
+        categoria: a.categoria,
+        etiquetas: a.etiquetas,
+        autorNombre: a.autor_nombre,
+        autorCargo: a.autor_cargo,
+        coverPreview: a.cover_url,
+        autorPreview: a.autor_url,
+        destacado: a.destacado || false,
+        creadoEn: a.created_at
+      }));
 
-        setArticulos(mapped);
-      } catch (error) {
-        console.error("Error loading articles:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadArticulos();
+      setArticulos(mapped);
+    } catch (error) {
+      console.error("Error loading articles:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadArticulos(true);
+  }, [loadArticulos]);
 
   const agregarArticulo = async (a: Omit<Articulo, "id" | "creadoEn">) => {
     const supabase = createClient();
@@ -176,7 +176,7 @@ export function ArticulosProvider({ children }: { children: ReactNode }) {
       agregarArticulo, 
       eliminarArticulo, 
       actualizarArticulo,
-      recargarArticulos: loadArticulos 
+      recargarArticulos: () => loadArticulos() 
     }}>
       {children}
     </ArticulosContext.Provider>
