@@ -40,11 +40,12 @@ const ProductosContext = createContext<ProductosContextType>({
 export function ProductosProvider({ children }: { children: ReactNode }) {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+
 
   const loadProductos = async () => {
     setLoading(true);
     try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from("productos")
         .select("*")
@@ -79,6 +80,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const agregarProducto = async (p: Omit<Producto, "id" | "creadoEn">) => {
+    const supabase = createClient();
     // 1. Fetch current products to calculate new positions
     const { data: actuales } = await supabase
       .from("productos")
@@ -120,6 +122,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
   };
 
   const eliminarProducto = async (id: string) => {
+    const supabase = createClient();
     const { error } = await supabase
       .from("productos")
       .delete()
@@ -142,6 +145,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
   };
 
   const actualizarProducto = async (p: Producto) => {
+    const supabase = createClient();
     // 1. Fetch all except the one being updated
     const { data: actuales } = await supabase
       .from("productos")
@@ -179,6 +183,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
   };
 
   const pausarProducto = async (id: string) => {
+    const supabase = createClient();
     const p = productos.find(x => x.id === id);
     if (!p) return;
 

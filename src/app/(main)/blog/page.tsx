@@ -18,9 +18,8 @@ function formatDate(iso: string) {
 export default function BlogPage() {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
-
   useEffect(() => {
+    const supabase = createClient();
     async function loadArticles() {
       try {
         const { data, error } = await supabase
@@ -38,7 +37,7 @@ export default function BlogPage() {
       }
     }
     loadArticles();
-  }, [supabase]);
+  }, []);
 
   if (loading) {
     return (

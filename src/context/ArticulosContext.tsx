@@ -41,11 +41,12 @@ const ArticulosContext = createContext<ArticulosContextType>({
 export function ArticulosProvider({ children }: { children: ReactNode }) {
   const [articulos, setArticulos] = useState<Articulo[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+
 
   const loadArticulos = async () => {
     setLoading(true);
     try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from("articulos")
         .select("*")
@@ -83,6 +84,7 @@ export function ArticulosProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const agregarArticulo = async (a: Omit<Articulo, "id" | "creadoEn">) => {
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (a.destacado) {
@@ -112,6 +114,7 @@ export function ArticulosProvider({ children }: { children: ReactNode }) {
   };
 
   const eliminarArticulo = async (id: string) => {
+    const supabase = createClient();
     const { error } = await supabase
       .from("articulos")
       .delete()
@@ -122,6 +125,7 @@ export function ArticulosProvider({ children }: { children: ReactNode }) {
   };
 
   const actualizarArticulo = async (a: Articulo) => {
+    const supabase = createClient();
     if (a.destacado) {
       await supabase.from("articulos").update({ destacado: false }).eq("destacado", true);
     }

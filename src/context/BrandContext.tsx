@@ -27,11 +27,12 @@ const BrandContext = createContext<BrandContextType>({
 export function BrandProvider({ children }: { children: ReactNode }) {
   const [brand, setBrand] = useState<BrandData>({ nombre: "", avatar: null, bio: "", linkedin: "", correo: "", cargo: "" });
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+
 
   useEffect(() => {
     async function loadBrand() {
       try {
+        const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const { data, error } = await supabase
@@ -59,10 +60,11 @@ export function BrandProvider({ children }: { children: ReactNode }) {
   }
 
   loadBrand();
-}, [supabase]);
+}, []);
 
 const actualizarBrand = async (data: BrandData) => {
   try {
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("No hay una sesión de usuario activa.");
 

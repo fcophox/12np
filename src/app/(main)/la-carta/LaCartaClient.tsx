@@ -11,9 +11,8 @@ export default function LaCartaClient() {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
-
   useEffect(() => {
+    const supabase = createClient();
     async function loadProducts() {
       try {
         const { data, error } = await supabase
@@ -31,7 +30,7 @@ export default function LaCartaClient() {
       }
     }
     loadProducts();
-  }, [supabase]);
+  }, []);
 
   // Obtener categorías únicas de los productos
   const categories = ["Todos", ...Array.from(new Set(products.map(p => p.etiqueta).filter(Boolean)))];
