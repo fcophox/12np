@@ -67,10 +67,11 @@ export default function LaPasteleraClient() {
         .order("orden", { ascending: true });
 
       if (!error && data && data.length > 0) {
-        setImages(data.map(img => ({
+        const heights = [700, 400, 600, 500, 800, 450, 650, 400, 600];
+        setImages(data.map((img, i) => ({
           src: img.url,
           w: 500,
-          h: 600, // Balanced height
+          h: heights[i % heights.length],
           alt: "Momento artesanal 12enpunto"
         })));
       }
