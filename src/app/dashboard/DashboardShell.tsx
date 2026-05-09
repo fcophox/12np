@@ -21,14 +21,19 @@ import { ProductosProvider } from "@/context/ProductosContext";
 import { BrandProvider, useBrand } from "@/context/BrandContext";
 import { logout } from "@/app/login/actions";
 
-const navItems = [
+const primaryNavItems = [
   { label: "Inicio", href: "/dashboard", icon: Home },
   { label: "Brand", href: "/dashboard/brand", icon: Palette },
   { label: "Productos", href: "/dashboard/productos", icon: Layers },
   { label: "Artículos", href: "/dashboard/articulos", icon: FileText },
+];
+
+const secondaryNavItems = [
   { label: "Contacto", href: "/dashboard/contacto", icon: MessageSquare },
   { label: "Cotizaciones", href: "/dashboard/cotizaciones", icon: ClipboardList },
 ];
+
+const navItems = [...primaryNavItems, ...secondaryNavItems];
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Inicio",
@@ -140,8 +145,37 @@ function DashboardContent({
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-2 py-4 flex flex-col gap-0.5">
-          {navItems.map(({ label, href, icon: Icon }) => {
+        <nav className="flex-1 px-2 py-4 flex flex-col gap-0.5 overflow-y-auto no-scrollbar">
+          {primaryNavItems.map(({ label, href, icon: Icon }) => {
+            const active = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                title={collapsed ? label : undefined}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  active
+                    ? "bg-[#f9f4e8] text-[#3d332e] font-semibold"
+                    : "text-[#3d332e]/60 hover:bg-[#f9f4e8]/60 hover:text-[#3d332e]"
+                } ${collapsed ? "justify-center" : ""}`}
+              >
+                <Icon size={17} className="shrink-0" />
+                {!collapsed && label}
+              </Link>
+            );
+          })}
+
+          {/* Separator Section */}
+          <div className="mt-6 mb-2 px-3">
+            <div className="border-t border-[#e8e3dd] mb-4" />
+            {!collapsed && (
+              <p className="text-[10px] font-bold text-[#3d332e]/30 uppercase tracking-[0.15em] ml-1">
+                Gestión de clientes
+              </p>
+            )}
+          </div>
+
+          {secondaryNavItems.map(({ label, href, icon: Icon }) => {
             const active = pathname === href;
             return (
               <Link
