@@ -140,13 +140,8 @@ function DashboardContent({
         {/* Brand header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-[#e8e3dd]">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-md bg-[#f9f4e8] flex items-center justify-center shrink-0 overflow-hidden">
-              {avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatar} alt="Logo" className="w-full h-full object-cover" />
-              ) : (
-                <Image src="/images/brand/12np-v.svg" alt="12np" width={18} height={18} style={{ height: 'auto' }} />
-              )}
+            <div className="w-8 h-8 rounded-md bg-[#f9f4e8] flex items-center justify-center shrink-0 overflow-hidden p-1.5">
+              <Image src="/images/brand/12np-v.svg" alt="12np" width={24} height={24} style={{ height: 'auto' }} />
             </div>
             {!collapsed && (
               <div className="min-w-0">
@@ -262,13 +257,8 @@ function DashboardContent({
         <div className="md:hidden sticky top-0 z-30 bg-white border-b border-[#e8e3dd] flex items-center justify-between px-4 h-14 shrink-0">
           {/* Left: back button or logo */}
           {isRoot ? (
-            <div className="w-8 h-8 rounded-md bg-[#f9f4e8] flex items-center justify-center overflow-hidden">
-              {avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatar} alt="Logo" className="w-full h-full object-cover" />
-              ) : (
-                <Image src="/images/brand/12np-v.svg" alt="12np" width={16} height={16} style={{ height: 'auto' }} />
-              )}
+            <div className="w-8 h-8 rounded-md bg-[#f9f4e8] flex items-center justify-center overflow-hidden p-1.5">
+              <Image src="/images/brand/12np-v.svg" alt="12np" width={20} height={20} style={{ height: 'auto' }} />
             </div>
           ) : (
             <button
