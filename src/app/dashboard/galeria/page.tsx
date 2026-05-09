@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   Sparkles,
   Heart,
-  Hammer
+  Hammer,
+  type LucideIcon
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
@@ -20,7 +21,7 @@ import DeleteModal from "@/components/DeleteModal";
 
 type Categoria = "hero" | "recuerdos" | "artesanal";
 
-const CATEGORIES: { id: Categoria; label: string; icon: any; description: string }[] = [
+const CATEGORIES: { id: Categoria; label: string; icon: LucideIcon; description: string }[] = [
   { 
     id: "hero", 
     label: "Galería Hero", 

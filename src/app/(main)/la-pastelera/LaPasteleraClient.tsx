@@ -8,7 +8,14 @@ import BlurFadeIn from "@/components/BlurFadeIn";
 
 import B2BBanner from "@/components/B2BBanner";
 
-const GALLERY_IMAGES = [
+interface GalleryImage {
+  src: string;
+  w: number;
+  h: number;
+  alt: string;
+}
+
+const GALLERY_IMAGES: GalleryImage[] = [
   { src: "/images/products/products1.webp", w: 500, h: 700, alt: "Torta artesanal elaborada en el taller de 12enpunto" },
   { src: "/images/left-1.png", w: 500, h: 400, alt: "Preparación de pastelería artesanal en 12enpunto" },
   { src: "/images/right-2.png", w: 500, h: 600, alt: "Detalle de repostería artesanal de 12enpunto" },
@@ -31,14 +38,12 @@ export default function LaPasteleraClient() {
     avatar_url?: string;
     cargo?: string;
   } | null>(null);
-  const [images, setImages] = useState<any[]>(GALLERY_IMAGES);
+  const [images, setImages] = useState<GalleryImage[]>(GALLERY_IMAGES);
 
   useEffect(() => {
     // Author Loading logic
-    async function loadAuthor() {
+    const loadAuthor = async () => {
       const supabase = createClient();
-      
-      // Fetch the most recently updated profile (usually the user's main profile)
       const { data, error } = await supabase
         .from("profiles")
         .select("full_name, avatar_url, cargo")
@@ -46,19 +51,12 @@ export default function LaPasteleraClient() {
         .limit(1)
         .maybeSingle();
       
-      if (error) {
-        console.error("Error fetching profile:", error);
-      }
-      
-      if (data) {
+      if (!error && data) {
         setAuthor(data);
-      } else {
-        console.log("No se encontró ningún perfil. Revisa las políticas RLS en Supabase.");
       }
-    }
-    loadAuthor();
+    };
 
-    async function loadArtesanalImages() {
+    const loadArtesanalImages = async () => {
       const supabase = createClient();
       const { data, error } = await supabase
         .from("galeria")
@@ -75,13 +73,16 @@ export default function LaPasteleraClient() {
           alt: "Momento artesanal 12enpunto"
         })));
       }
-    }
+    };
+
+    loadAuthor();
     loadArtesanalImages();
 
     // Carousel Logic
     const track = trackRef.current;
     if (!track) return;
 
+    let animationFrameId: number;
     const animate = () => {
       if (track) {
         posRef.current += maxSpeed;
@@ -91,12 +92,12 @@ export default function LaPasteleraClient() {
         }
         track.style.transform = `translateX(-${posRef.current}px)`;
       }
-      animRef.current = requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
-    animRef.current = requestAnimationFrame(animate);
+    animationFrameId = requestAnimationFrame(animate);
     return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
+      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 

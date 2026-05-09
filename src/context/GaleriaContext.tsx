@@ -32,7 +32,6 @@ export function GaleriaProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadGaleria = async () => {
-    setLoading(true);
     try {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -105,23 +104,17 @@ export function GaleriaProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ContactosProvider>
-      <GaleriaContext.Provider value={{ 
-        imagenes, 
-        loading, 
-        agregarImagen, 
-        eliminarImagen,
-        recargarGaleria: loadGaleria 
-      }}>
-        {children}
-      </GaleriaContext.Provider>
-    </ContactosProvider>
+    <GaleriaContext.Provider value={{ 
+      imagenes, 
+      loading, 
+      agregarImagen, 
+      eliminarImagen,
+      recargarGaleria: loadGaleria 
+    }}>
+      {children}
+    </GaleriaContext.Provider>
   );
 }
-
-// Fixed circular dependency / missing provider wrapper in previous turn context management:
-// Actually, I'll just keep it clean.
-import { ContactosProvider } from "./ContactosContext";
 
 export function useGaleria() {
   return useContext(GaleriaContext);

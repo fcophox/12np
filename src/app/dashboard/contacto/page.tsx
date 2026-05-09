@@ -246,8 +246,9 @@ export default function ContactoPage() {
       toast.success("Mensaje eliminado");
       if (selectedContacto?.id === deleteModal.id) setSelectedContacto(null);
       setDeleteModal({ isOpen: false, id: null });
-    } catch (e) {
+    } catch (err) {
       toast.error("Error al eliminar");
+      console.error(err);
     }
   };
 

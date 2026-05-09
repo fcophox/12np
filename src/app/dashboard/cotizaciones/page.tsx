@@ -290,8 +290,9 @@ export default function CotizacionesPage() {
       toast.success("Cotización eliminada");
       if (selectedCotizacion?.id === deleteModal.id) setSelectedCotizacion(null);
       setDeleteModal({ isOpen: false, id: null });
-    } catch (e) {
+    } catch (err) {
       toast.error("Error al eliminar");
+      console.error(err);
     }
   };
 

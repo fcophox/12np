@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 export interface Producto {
@@ -56,7 +56,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
 
-  const loadProductos = async () => {
+  const loadProductos = useCallback(async () => {
     setLoading(true);
     try {
       const supabase = createClient();
@@ -87,11 +87,11 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadProductos();
-  }, []);
+  }, [loadProductos]);
 
   const agregarProducto = async (p: Omit<Producto, "id" | "creadoEn">) => {
     const supabase = createClient();

@@ -22,7 +22,7 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll() {
           // No necesitamos setear aquí porque updateSession ya se encarga
         },
       },

@@ -91,6 +91,16 @@ export default function DashboardShell({ children, userEmail, userName: initialU
   );
 }
 
+interface DashboardContentProps {
+  children: React.ReactNode;
+  pathname: string;
+  router: any; // Next.js router type is complex, but better than 'any' if possible. Actually, useRouter returns AppRouterInstance.
+  collapsed: boolean;
+  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  userEmail: string;
+  initialUserName: string;
+}
+
 function DashboardContent({ 
   children, 
   pathname, 
@@ -99,7 +109,7 @@ function DashboardContent({
   setCollapsed, 
   userEmail, 
   initialUserName 
-}: any) {
+}: DashboardContentProps) {
   const { brand } = useBrand();
   
   const title = getMobileTitle(pathname);

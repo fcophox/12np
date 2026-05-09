@@ -30,7 +30,7 @@ export function BrandProvider({ children }: { children: ReactNode }) {
 
 
   useEffect(() => {
-    async function loadBrand() {
+    const loadBrand = async () => {
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -41,7 +41,7 @@ export function BrandProvider({ children }: { children: ReactNode }) {
             .eq("id", user.id)
             .single();
 
-          if (data) {
+          if (data && !error) {
             setBrand({
               nombre: data.full_name || "",
               avatar: data.avatar_url,
@@ -52,15 +52,15 @@ export function BrandProvider({ children }: { children: ReactNode }) {
             });
           }
         }
-      } catch (error: any) {
-      console.error("Error loading brand data from Supabase:", error.message || error);
-    } finally {
-      setLoading(false);
-    }
-  }
+      } catch (error) {
+        console.error("Error loading brand data from Supabase:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  loadBrand();
-}, []);
+    loadBrand();
+  }, []);
 
 const actualizarBrand = async (data: BrandData) => {
   try {
@@ -87,8 +87,8 @@ const actualizarBrand = async (data: BrandData) => {
     }
     
     setBrand(data);
-  } catch (error: any) {
-    console.error("Error updating brand data in Supabase:", error.message || error);
+  } catch (error) {
+    console.error("Error updating brand data in Supabase:", error);
     throw error;
   }
 };
