@@ -10,9 +10,16 @@ export async function sendContactEmail(formData: {
   whatsapp: string;
   mensaje: string;
 }) {
+  console.log("Iniciando envío de correo de contacto...");
+  
+  if (!process.env.RESEND_API_KEY) {
+    console.error("RESEND_API_KEY no encontrada en las variables de entorno.");
+    return { success: false, error: "API Key missing" };
+  }
+
   try {
     const { data, error } = await resend.emails.send({
-      from: '12enpunto <onboarding@resend.dev>', // Usar este mientras se valida dominio
+      from: '12enpunto <onboarding@resend.dev>',
       to: ['somos12enpunto@gmail.com'],
       subject: `Nuevo mensaje de contacto: ${formData.nombre}`,
       html: `
@@ -36,13 +43,14 @@ export async function sendContactEmail(formData: {
     });
 
     if (error) {
-      console.error("Error sending email via Resend:", error);
+      console.error("Error de Resend:", error);
       return { success: false, error };
     }
 
+    console.log("Correo enviado exitosamente:", data);
     return { success: true, data };
   } catch (error) {
-    console.error("Unexpected error sending email:", error);
+    console.error("Error inesperado enviando correo:", error);
     return { success: false, error };
   }
 }
@@ -58,6 +66,13 @@ export async function sendQuotationEmail(formData: {
   };
   detalleAdicional: string;
 }) {
+  console.log("Iniciando envío de correo de cotización...");
+
+  if (!process.env.RESEND_API_KEY) {
+    console.error("RESEND_API_KEY no encontrada.");
+    return { success: false, error: "API Key missing" };
+  }
+
   try {
     const { data, error } = await resend.emails.send({
       from: '12enpunto <onboarding@resend.dev>',
@@ -98,13 +113,14 @@ export async function sendQuotationEmail(formData: {
     });
 
     if (error) {
-      console.error("Error sending quotation email via Resend:", error);
+      console.error("Error de Resend (Cotización):", error);
       return { success: false, error };
     }
 
+    console.log("Cotización enviada exitosamente:", data);
     return { success: true, data };
   } catch (error) {
-    console.error("Unexpected error sending quotation email:", error);
+    console.error("Error inesperado en cotización:", error);
     return { success: false, error };
   }
 }
