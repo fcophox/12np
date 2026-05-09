@@ -318,6 +318,14 @@ function DashboardContent({
                     <ClipboardList size={16} className="text-[#3d332e]/40" />
                     <span>Cotizaciones</span>
                   </Link>
+                  <Link 
+                    href="/dashboard/contacto" 
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#3d332e] hover:bg-[#f9f4e8] transition-colors border-t border-[#f5f5f5]"
+                  >
+                    <MessageSquare size={16} className="text-[#3d332e]/40" />
+                    <span>Contacto</span>
+                  </Link>
                 </div>
               </>
             )}
@@ -341,7 +349,7 @@ function DashboardContent({
 
       {/* Mobile bottom nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#e8e3dd] flex items-center justify-around px-2 h-16 safe-area-pb">
-        {navItems.map(({ label, href, icon: Icon }) => {
+        {primaryNavItems.map(({ label, href, icon: Icon }) => {
           const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
           return (
             <Link
