@@ -54,7 +54,7 @@ export function ArticulosProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      const mapped = (data || []).map(a => ({
+      const mapped = (data || []).map((a: any) => ({
         id: a.id,
         titulo: a.titulo,
         slug: a.slug,

@@ -53,7 +53,7 @@ export function ProductosProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
       
-      const mapped = (data || []).map(p => ({
+      const mapped = (data || []).map((p: any) => ({
         id: p.id,
         nombre: p.nombre,
         frase: p.frase,
