@@ -54,10 +54,14 @@ export default function BlogPostClient({ post }: { post: any }) {
     linkedin?: string;
     correo?: string;
   } | null>(null);
+  const [isAuthorLoading, setIsAuthorLoading] = useState(true);
 
   useEffect(() => {
     async function loadAuthorProfile() {
-      if (!post.user_id) return;
+      if (!post.user_id) {
+        setIsAuthorLoading(false);
+        return;
+      }
       const supabase = createClient();
       try {
         const { data, error } = await supabase
@@ -70,6 +74,8 @@ export default function BlogPostClient({ post }: { post: any }) {
         }
       } catch (err) {
         console.error("No se pudo cargar el perfil del autor", err);
+      } finally {
+        setIsAuthorLoading(false);
       }
     }
     loadAuthorProfile();
@@ -107,8 +113,10 @@ export default function BlogPostClient({ post }: { post: any }) {
 
           <div className="flex flex-wrap items-center justify-between gap-6 pt-6 border-t border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100">
-                {authorProfile?.avatar_url || post.autor_url ? (
+              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100 shrink-0">
+                {isAuthorLoading ? (
+                  <div className="w-full h-full bg-gray-200 animate-pulse" />
+                ) : authorProfile?.avatar_url || post.autor_url ? (
                   <Image src={authorProfile?.avatar_url || post.autor_url} alt={authorProfile?.full_name || post.autor_nombre} fill className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -116,9 +124,18 @@ export default function BlogPostClient({ post }: { post: any }) {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-[#1a1a1a]">{authorProfile?.full_name || post.autor_nombre || "Francisca"}</span>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{post.autor_cargo || "Fundadora"}</span>
+              <div className="flex flex-col min-w-[100px]">
+                {isAuthorLoading ? (
+                  <>
+                    <div className="h-4 w-24 bg-gray-200 animate-pulse rounded mb-1" />
+                    <div className="h-3 w-16 bg-gray-100 animate-pulse rounded" />
+                  </>
+                ) : (
+                  <>
+                    <span className="text-sm font-bold text-[#1a1a1a]">{authorProfile?.full_name || post.autor_nombre || "Francisca"}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{post.autor_cargo || "Fundadora"}</span>
+                  </>
+                )}
               </div>
             </div>
             
@@ -180,7 +197,9 @@ export default function BlogPostClient({ post }: { post: any }) {
           {/* Author Bio Card */}
           <div className="mt-20 p-8 md:p-10 bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-200/20 flex flex-col md:flex-row gap-8 items-start">
             <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden flex-shrink-0 bg-gray-50 ring-4 ring-white shadow-lg">
-              {authorProfile?.avatar_url || post.autor_url ? (
+              {isAuthorLoading ? (
+                <div className="w-full h-full bg-gray-200 animate-pulse" />
+              ) : authorProfile?.avatar_url || post.autor_url ? (
                 <Image src={authorProfile?.avatar_url || post.autor_url} alt={authorProfile?.full_name || post.autor_nombre} fill className="object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -188,13 +207,23 @@ export default function BlogPostClient({ post }: { post: any }) {
                 </div>
               )}
             </div>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-[#1a1a1a]">
-                {authorProfile?.full_name || post.autor_nombre || "Francisca"}
-              </h3>
-              <p className="text-gray-500 leading-relaxed max-w-xl">
-                {authorProfile?.bio || "Fundadora de 12enpunto y apasionada por la alquimia de los sabores. Cree que la mejor pastelería es la que cuenta una historia honesta."}
-              </p>
+            <div className="flex flex-col gap-4 flex-1">
+              {isAuthorLoading ? (
+                <>
+                  <div className="h-8 w-48 bg-gray-200 animate-pulse rounded" />
+                  <div className="h-4 w-full bg-gray-100 animate-pulse rounded" />
+                  <div className="h-4 w-2/3 bg-gray-100 animate-pulse rounded" />
+                </>
+              ) : (
+                <>
+                  <h3 className="text-2xl font-bold font-[family-name:var(--font-fraunces)] text-[#1a1a1a]">
+                    {authorProfile?.full_name || post.autor_nombre || "Francisca"}
+                  </h3>
+                  <p className="text-gray-500 leading-relaxed max-w-xl">
+                    {authorProfile?.bio || "Fundadora de 12enpunto y apasionada por la alquimia de los sabores. Cree que la mejor pastelería es la que cuenta una historia honesta."}
+                  </p>
+                </>
+              )}
               
               <div className="flex items-center gap-4 mt-2">
                 {authorProfile?.linkedin && (

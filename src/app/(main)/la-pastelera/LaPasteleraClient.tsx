@@ -39,20 +39,27 @@ export default function LaPasteleraClient() {
     cargo?: string;
   } | null>(null);
   const [images, setImages] = useState<GalleryImage[]>(GALLERY_IMAGES);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Author Loading logic
     const loadAuthor = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("full_name, avatar_url, cargo")
-        .order("updated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      
-      if (!error && data) {
-        setAuthor(data);
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url, cargo")
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (!error && data) {
+          setAuthor(data);
+        }
+      } catch (err) {
+        console.error("Error loading author:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -149,20 +156,32 @@ export default function LaPasteleraClient() {
                 &ldquo;Entre recetas, pruebas, errores y pequeños logros, fuimos construyendo algo más que preparaciones dulces: fuimos creando un espacio lleno de dedicación, paciencia y mucho amor.&rdquo;
               </p>
               <div className="flex items-center gap-4">
-                <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-orange-100 shadow-sm shrink-0">
-                  <Image
-                    src={author?.avatar_url || "/images/team/francisca.png"}
-                    alt={author?.full_name || "Francisca"}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-bold text-[#1a1a1a]">{author?.full_name || "Francisca"}</span>
-                  <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">
-                    {author?.cargo || "Fundadora & Pastelera de 12enpunto"}
-                  </span>
-                </div>
+                {isLoading ? (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse border-2 border-orange-50 shrink-0" />
+                    <div className="flex flex-col gap-2">
+                      <div className="h-4 w-32 bg-gray-200 animate-pulse rounded" />
+                      <div className="h-3 w-48 bg-gray-100 animate-pulse rounded" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-orange-100 shadow-sm shrink-0">
+                      <Image
+                        src={author?.avatar_url || "/images/team/francisca.png"}
+                        alt={author?.full_name || "Francisca"}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-[#1a1a1a]">{author?.full_name || "Francisca"}</span>
+                      <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">
+                        {author?.cargo || "Fundadora & Pastelera de 12enpunto"}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </BlurFadeIn>
