@@ -109,30 +109,30 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="flex md:grid md:grid-cols-3 gap-3 md:gap-4 mb-6 overflow-x-auto pb-2 md:pb-0 no-scrollbar snap-x snap-mandatory -mx-5 px-5 md:mx-0 md:px-0">
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="bg-white rounded-xl border border-[#e8e3dd] p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="flex-shrink-0 w-[240px] md:w-full bg-white rounded-xl border border-[#e8e3dd] p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow snap-center"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-semibold tracking-widest text-[#3d332e]/40 uppercase">
+              <span className="text-[9px] md:text-[10px] font-semibold tracking-widest text-[#3d332e]/40 uppercase">
                 {stat.label}
               </span>
-              <stat.icon size={20} className={stat.iconColor} />
+              <stat.icon size={18} className={stat.iconColor} />
             </div>
-            <p className="text-2xl md:text-3xl font-bold text-[#3d332e] mb-3">{stat.value}</p>
+            <p className="text-xl md:text-3xl font-bold text-[#3d332e] mb-3">{stat.value}</p>
             <div className="flex items-center gap-2 text-sm">
               {stat.changeBadge ? (
-                <span className="bg-[#f9f4e8] text-[#3d332e]/70 text-xs px-2 py-0.5 rounded-md font-medium">
+                <span className="bg-[#f9f4e8] text-[#3d332e]/70 text-[10px] md:text-xs px-2 py-0.5 rounded-md font-medium">
                   {stat.change}
                 </span>
               ) : (
-                <span className={`font-semibold text-xs ${stat.changeColor}`}>
+                <span className={`font-semibold text-[10px] md:text-xs ${stat.changeColor}`}>
                   {stat.change}
                 </span>
               )}
-              <span className="text-[#3d332e]/40 text-xs">{stat.changeLabel}</span>
+              <span className="text-[#3d332e]/40 text-[10px] md:text-xs">{stat.changeLabel}</span>
             </div>
           </div>
         ))}
