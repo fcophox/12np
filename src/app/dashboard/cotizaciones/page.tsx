@@ -12,42 +12,211 @@ import {
   CheckCircle, 
   Circle,
   Package,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  MessageSquare
+  X,
+  User,
+  Calendar,
+  MessageSquare,
+  ChevronRight
 } from "lucide-react";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("es-CL", {
     day: "numeric",
-    month: "short",
+    month: "long",
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit"
   });
 }
 
+function CotizacionDrawer({ 
+  cotizacion, 
+  onClose, 
+  onToggleLeido 
+}: { 
+  cotizacion: Cotizacion; 
+  onClose: () => void;
+  onToggleLeido: (id: string, leido: boolean) => void;
+}) {
+  const { productos: allProducts } = useProductos();
+  if (!cotizacion) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex justify-end">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-[#3d332e]/40 backdrop-blur-sm"
+      />
+
+      {/* Drawer Content */}
+      <motion.div
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="relative w-full max-w-lg bg-[#fdfbf7] h-full shadow-2xl flex flex-col border-l border-[#e8e3dd]"
+      >
+        {/* Header */}
+        <div className="p-6 border-b border-[#e8e3dd] bg-white flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#f9f4e8] flex items-center justify-center text-[#74865e]">
+              <Building2 size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold text-[#3d332e]">Detalle de Cotización</h3>
+              <p className="text-[10px] text-[#3d332e]/40 uppercase font-bold tracking-widest">Empresa / Pyme</p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-[#f9f4e8] rounded-full transition-colors text-[#3d332e]/40"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-8">
+          {/* Header Info */}
+          <div className="space-y-6">
+             <div className="flex flex-col gap-1">
+               <span className="text-[10px] font-bold text-[#3d332e]/30 uppercase tracking-[0.2em]">Empresa</span>
+               <p className="text-2xl font-bold text-[#3d332e] font-[family-name:var(--font-fraunces)] leading-tight">{cotizacion.empresa}</p>
+             </div>
+
+             <div className="bg-white p-6 rounded-2xl border border-[#e8e3dd] shadow-sm space-y-4">
+                <div className="flex items-center gap-4">
+                   <div className="w-10 h-10 rounded-full bg-[#3d332e] flex items-center justify-center text-white text-xs font-bold">
+                     {cotizacion.contacto[0]}
+                   </div>
+                   <div>
+                     <p className="text-sm font-bold text-[#3d332e]">{cotizacion.contacto}</p>
+                     <p className="text-[10px] text-[#3d332e]/40 font-bold uppercase tracking-widest">Persona de contacto</p>
+                   </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-[#e8e3dd]/50">
+                  <a href={`mailto:${cotizacion.email}`} className="text-xs font-semibold text-[#f15a24] hover:underline flex items-center gap-2">
+                    <Mail size={12} /> {cotizacion.email}
+                  </a>
+                  <a href={`https://wa.me/${cotizacion.tel.replace(/\D/g, '')}`} target="_blank" className="text-xs font-semibold text-[#3d332e] flex items-center gap-2">
+                    <Phone size={12} className="text-[#25D366]" /> {cotizacion.tel}
+                  </a>
+                </div>
+             </div>
+          </div>
+
+          {/* Products List */}
+          <div className="space-y-4">
+             <h4 className="text-[10px] font-bold text-[#3d332e]/40 uppercase tracking-[0.2em] flex items-center gap-2">
+               <Package size={12} /> Productos Solicitados
+             </h4>
+             <div className="bg-white rounded-2xl border border-[#e8e3dd] overflow-hidden shadow-sm">
+                {cotizacion.productos.seleccionados.map((pid) => {
+                  const product = allProducts.find(p => p.id === pid);
+                  return (
+                    <div key={pid} className="flex items-center justify-between px-4 py-3 border-b border-[#e8e3dd] last:border-0 group/item">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-[#fdfbf7] border border-[#e8e3dd]/50 overflow-hidden relative flex-shrink-0">
+                          {product?.imagen ? (
+                            <Image src={product.imagen} alt="" fill className="object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[#3d332e]/20 text-[10px]">IMG</div>
+                          )}
+                        </div>
+                        <span className="text-sm font-bold text-[#3d332e]">{product?.nombre || 'Producto eliminado'}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm font-bold text-[#74865e] bg-[#74865e]/5 px-3 py-1 rounded-full border border-[#74865e]/10">
+                          {cotizacion.productos.cantidades[pid] || '0'} uds.
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+             </div>
+          </div>
+
+          {/* Additional Details */}
+          {cotizacion.detalleAdicional && (
+            <div className="space-y-3">
+               <span className="text-[10px] font-bold text-[#3d332e]/30 uppercase tracking-[0.2em] flex items-center gap-2">
+                 <MessageSquare size={12} /> Comentarios adicionales
+               </span>
+               <div className="bg-[#f9f4e8]/50 p-6 rounded-[2rem] border border-[#e8e3dd] italic text-[#3d332e]/80 text-sm leading-relaxed">
+                  &quot;{cotizacion.detalleAdicional}&quot;
+               </div>
+            </div>
+          )}
+
+          {/* Footer Metadata */}
+          <div className="pt-6 border-t border-[#e8e3dd] flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[11px] text-[#3d332e]/40 font-medium">
+              <Calendar size={12} />
+              Solicitado el {formatDate(cotizacion.creadoEn)}
+            </div>
+            <button 
+              onClick={() => onToggleLeido(cotizacion.id, !cotizacion.leido)}
+              className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border transition-all ${
+                cotizacion.leido 
+                ? "border-[#3d332e]/10 text-[#3d332e]/40" 
+                : "border-[#74865e]/20 bg-[#74865e]/5 text-[#74865e]"
+              }`}
+            >
+              {cotizacion.leido ? "Marcar pendiente" : "Marcar gestionado"}
+            </button>
+          </div>
+        </div>
+
+        {/* Action Bar */}
+        <div className="p-6 bg-white border-t border-[#e8e3dd] flex gap-3">
+          <a 
+            href={`mailto:${cotizacion.email}?subject=Cotización 12 en Punto - ${cotizacion.empresa}`}
+            className="flex-1 flex items-center justify-center gap-2 bg-[#3d332e] text-white py-4 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-[#2a2220] transition-all shadow-lg shadow-[#3d332e]/10"
+          >
+             Enviar Propuesta
+          </a>
+          <a 
+            href={`https://wa.me/${cotizacion.tel.replace(/\D/g, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-14 h-14 flex items-center justify-center bg-[#25D366] text-white rounded-2xl hover:bg-[#128C7E] transition-all shadow-lg shadow-[#25D366]/20"
+          >
+            <Phone size={20} />
+          </a>
+        </div>
+      </motion.div>
+    </div>,
+    document.body
+  );
+}
+
 function CotizacionRow({ 
   c, 
   onEliminar, 
-  onToggleLeido 
+  onToggleLeido,
+  onClick
 }: { 
   c: Cotizacion; 
   onEliminar: (id: string) => void;
   onToggleLeido: (id: string, leido: boolean) => void;
+  onClick: () => void;
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { productos: allProducts } = useProductos();
-
   return (
-    <div className={`group border-b border-[#e8e3dd] last:border-0 transition-colors ${!c.leido ? "bg-[#fdfbf7]" : "bg-white hover:bg-[#fcfaf8]"}`}>
-      <div 
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-4 px-4 py-4 cursor-pointer"
-      >
+    <div 
+      onClick={onClick}
+      className={`group border-b border-[#e8e3dd] last:border-0 transition-colors cursor-pointer ${!c.leido ? "bg-[#fdfbf7]" : "bg-white hover:bg-[#fcfaf8]"}`}
+    >
+      <div className="flex items-center gap-4 px-4 py-4">
         {/* Status Icon */}
         <button 
           onClick={(e) => {
@@ -73,26 +242,17 @@ function CotizacionRow({
               <span className="text-[9px] font-bold bg-[#74865e] text-white px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Nueva</span>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#3d332e]/40">
+          <div className="flex items-center gap-4 text-xs text-[#3d332e]/40">
             <span className="font-semibold text-[#3d332e]/60">{c.contacto}</span>
-            <span className="flex items-center gap-1"><Mail size={10} /> {c.email}</span>
-            <span className="hidden sm:flex items-center gap-1"><Phone size={10} /> {c.tel}</span>
+            <span className="hidden lg:flex items-center gap-1"><Package size={10} /> {c.productos.seleccionados.length} items</span>
           </div>
-        </div>
-
-        {/* Badge info */}
-        <div className="hidden lg:flex shrink-0 items-center gap-2 px-3 py-1 bg-[#f9f4e8] rounded-full border border-[#e8e3dd]">
-           <Package size={10} className="text-[#3d332e]/40" />
-           <span className="text-[10px] font-bold text-[#3d332e]/60 uppercase tracking-tight">
-             {c.productos.seleccionados.length} {c.productos.seleccionados.length === 1 ? 'Producto' : 'Productos'}
-           </span>
         </div>
 
         {/* Date */}
         <div className="hidden md:block shrink-0 text-right w-32">
           <p className="text-[11px] font-medium text-[#3d332e]/30 flex items-center gap-1 justify-end">
             <Clock size={10} />
-            {formatDate(c.creadoEn)}
+            {new Date(c.creadoEn).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })}
           </p>
         </div>
 
@@ -103,97 +263,27 @@ function CotizacionRow({
               e.stopPropagation();
               onEliminar(c.id);
             }}
-            className="p-2 text-[#3d332e]/20 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+            className="p-2 text-[#3d332e]/20 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <Trash2 size={16} />
           </button>
-          <div className="p-1 text-[#3d332e]/20 group-hover:text-[#3d332e]/40 transition-colors">
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </div>
+          <ChevronRight size={16} className="text-[#3d332e]/10 group-hover:text-[#3d332e]/30 transition-colors" />
         </div>
       </div>
-
-      {/* Expanded View */}
-      {isExpanded && (
-        <div className="px-14 pb-8 animate-in slide-in-from-top-2 duration-200">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            {/* Column 1: Products */}
-            <div className="space-y-4">
-              <h4 className="text-[10px] font-bold text-[#3d332e]/40 uppercase tracking-widest flex items-center gap-2">
-                <Package size={12} /> Detalle de Pedido
-              </h4>
-              <div className="bg-white rounded-2xl border border-[#e8e3dd] overflow-hidden">
-                {c.productos.seleccionados.map((pid) => {
-                  const product = allProducts.find(p => p.id === pid);
-                  return (
-                    <div key={pid} className="flex items-center justify-between px-4 py-3 border-b border-[#e8e3dd] last:border-0">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#f9f4e8] overflow-hidden relative flex-shrink-0">
-                          {product?.imagen ? (
-                            <Image src={product.imagen} alt="" fill className="object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[#3d332e]/20">?</div>
-                          )}
-                        </div>
-                        <span className="text-sm font-bold text-[#3d332e]">{product?.nombre || 'Producto eliminado'}</span>
-                      </div>
-                      <span className="text-sm font-bold text-[#74865e] bg-[#74865e]/5 px-3 py-1 rounded-full border border-[#74865e]/10">
-                        {c.productos.cantidades[pid] || '0'} uds.
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Column 2: Additional Details & Contact */}
-            <div className="space-y-6">
-              {/* Message / Details */}
-              {c.detalleAdicional && (
-                <div className="bg-[#f9f4e8]/50 rounded-2xl p-5 border border-[#e8e3dd]/50">
-                  <h4 className="text-[10px] font-bold text-[#3d332e]/40 uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <MessageSquare size={12} /> Comentarios / Tiempo
-                  </h4>
-                  <p className="text-sm text-[#3d332e] leading-relaxed italic italic-font-serif">
-                    &quot;{c.detalleAdicional}&quot;
-                  </p>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3">
-                <a 
-                  href={`mailto:${c.email}?subject=Cotización 12 en Punto - ${c.empresa}`}
-                  className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#3d332e] text-white text-xs font-bold rounded-xl hover:bg-[#2a2220] transition-colors"
-                >
-                  Enviar Propuesta (Email)
-                </a>
-                <a 
-                  href={`https://wa.me/${c.tel.replace(/\D/g, '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#25D366] text-white text-xs font-bold rounded-xl hover:bg-[#128C7E] transition-colors"
-                >
-                  Contactar por WhatsApp
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
 export default function CotizacionesPage() {
   const { cotizaciones, loading, eliminarCotizacion, marcarComoLeido } = useCotizaciones();
+  const [selectedCotizacion, setSelectedCotizacion] = useState<Cotizacion | null>(null);
 
   const handleEliminar = async (id: string) => {
     if (confirm("¿Estás seguro de que quieres eliminar esta cotización?")) {
       try {
         await eliminarCotizacion(id);
         toast.success("Cotización eliminada");
+        if (selectedCotizacion?.id === id) setSelectedCotizacion(null);
       } catch (e) {
         toast.error("Error al eliminar");
       }
@@ -247,7 +337,6 @@ export default function CotizacionesPage() {
           <div className="hidden md:flex items-center gap-4 px-4 py-3 bg-[#fdfbf7] border-b border-[#e8e3dd]">
             <div className="w-[18px] shrink-0" />
             <p className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30">Empresa / Contacto</p>
-            <p className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30 w-32 text-center lg:mr-4">Resumen</p>
             <p className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30 w-32 text-right">Fecha Solicitud</p>
             <div className="w-14 shrink-0" />
           </div>
@@ -260,11 +349,23 @@ export default function CotizacionesPage() {
                 c={c} 
                 onEliminar={handleEliminar} 
                 onToggleLeido={marcarComoLeido} 
+                onClick={() => setSelectedCotizacion(c)}
               />
             ))}
           </div>
         </div>
       )}
+
+      {/* Drawer */}
+      <AnimatePresence>
+        {selectedCotizacion && (
+          <CotizacionDrawer 
+            cotizacion={selectedCotizacion} 
+            onClose={() => setSelectedCotizacion(null)} 
+            onToggleLeido={marcarComoLeido}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
