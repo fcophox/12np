@@ -1,15 +1,18 @@
 "use client";
 
-import { Eye, Layers, BookOpen, ChevronRight, FileText } from "lucide-react";
+import { Eye, Layers, BookOpen, ChevronRight, FileText, MessageSquare, ClipboardList } from "lucide-react";
 import { useBrand } from "@/context/BrandContext";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { brand, loading: brandLoading } = useBrand();
   const [counts, setCounts] = useState({
     articulos: 0,
     productos: 0,
+    contactos: 0,
+    cotizaciones: 0,
     visitas: 1240, // Placeholder
   });
   const [loading, setLoading] = useState(true);
@@ -18,14 +21,18 @@ export default function DashboardPage() {
     async function loadStats() {
       const supabase = createClient();
       
-      const [articulosRes, productosRes] = await Promise.all([
+      const [articulosRes, productosRes, contactosRes, cotizacionesRes] = await Promise.all([
         supabase.from("articulos").select("*", { count: "exact", head: true }),
-        supabase.from("productos").select("*", { count: "exact", head: true })
+        supabase.from("productos").select("*", { count: "exact", head: true }),
+        supabase.from("contactos").select("*", { count: "exact", head: true }),
+        supabase.from("cotizaciones").select("*", { count: "exact", head: true })
       ]);
 
       setCounts({
         articulos: articulosRes.count || 0,
         productos: productosRes.count || 0,
+        contactos: contactosRes.count || 0,
+        cotizaciones: cotizacionesRes.count || 0,
         visitas: 1240,
       });
       setLoading(false);
@@ -96,7 +103,24 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="p-5 md:p-10 pb-20 md:pb-10">
+    <div className="p-5 md:p-10 pb-28 md:pb-10">
+      {/* Mobile Header - Wireframe style */}
+      <div className="flex items-center gap-4 mb-8 md:hidden">
+        <Link href="/dashboard/perfil" className="w-14 h-14 rounded-full bg-[#3d332e] flex items-center justify-center text-white text-xl font-bold shrink-0 overflow-hidden border border-[#e8e3dd] active:scale-95 transition-transform">
+          {brand.avatar ? (
+            <img src={brand.avatar} alt={displayName} className="w-full h-full object-cover" />
+          ) : (
+            brand.nombre?.[0] || "U"
+          )}
+        </Link>
+        <div>
+          <Link href="/dashboard/perfil">
+            <h1 className="text-lg font-bold text-[#3d332e]">Hola, {displayName}</h1>
+          </Link>
+          <p className="text-xs text-[#3d332e]/50">Bienvenido a tu panel</p>
+        </div>
+      </div>
+
       {/* Greeting - desktop only */}
       <div className="hidden md:block mb-10">
         <h1 className="text-xl font-bold text-[#3d332e] mb-2">
@@ -108,41 +132,51 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="flex md:grid md:grid-cols-3 gap-3 md:gap-4 mb-6 overflow-x-auto pb-2 md:pb-0 no-scrollbar snap-x snap-mandatory -mx-5 px-5 md:mx-0 md:px-0">
-        {stats.map((stat) => (
+      {/* Stats - Grid on mobile for wireframe style */}
+      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-8">
+        {stats.map((stat, idx) => (
           <div
             key={stat.label}
-            className="flex-shrink-0 w-[240px] md:w-full bg-white rounded-xl border border-[#e8e3dd] p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow snap-center"
+            className="bg-white rounded-xl border border-[#e8e3dd] p-3 md:p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[9px] md:text-[10px] font-semibold tracking-widest text-[#3d332e]/40 uppercase">
+            <div className="mb-2">
+              <span className="text-[7px] md:text-[10px] font-bold tracking-wider text-[#3d332e]/40 uppercase block leading-tight">
                 {stat.label}
               </span>
-              <stat.icon size={18} className={stat.iconColor} />
             </div>
-            <p className="text-xl md:text-3xl font-bold text-[#3d332e] mb-3">{stat.value}</p>
-            <div className="flex items-center gap-2 text-sm">
-              {stat.changeBadge ? (
-                <span className="bg-[#f9f4e8] text-[#3d332e]/70 text-[10px] md:text-xs px-2 py-0.5 rounded-md font-medium">
-                  {stat.change}
-                </span>
-              ) : (
-                <span className={`font-semibold text-[10px] md:text-xs ${stat.changeColor}`}>
-                  {stat.change}
-                </span>
-              )}
-              <span className="text-[#3d332e]/40 text-[10px] md:text-xs">{stat.changeLabel}</span>
+            <p className="text-lg md:text-3xl font-bold text-[#3d332e] my-1">{stat.value}</p>
+            
+            {/* On mobile we show a simplified version to fit 3 in a row if needed, but let's try to keep style */}
+            <div className="mt-1 flex flex-col gap-0.5">
+              <span className={`font-bold text-[7px] md:text-xs ${stat.changeBadge ? 'text-[#3d332e]/60' : stat.changeColor}`}>
+                {stat.change}
+              </span>
+              <span className="text-[#3d332e]/30 text-[6px] md:text-xs hidden md:block">{stat.changeLabel}</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Recent activity */}
-      <div className="bg-white rounded-xl border border-[#e8e3dd] p-6 shadow-sm">
+      {/* Gestión de clientes - Mobile only section from wireframe */}
+      <div className="mb-8 md:hidden">
+        <h2 className="text-[10px] font-bold text-[#3d332e]/30 uppercase tracking-[0.2em] mb-4">Gestión de clientes</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/dashboard/contacto" className="bg-white border border-[#e8e3dd] rounded-xl p-4 flex flex-col items-center justify-center gap-1 shadow-sm active:scale-95 transition-transform">
+            <MessageSquare size={18} className="text-[#3d332e]/40 mb-1" />
+            <span className="text-xs font-bold text-[#3d332e]">Contactos ({counts.contactos})</span>
+          </Link>
+          <Link href="/dashboard/cotizaciones" className="bg-white border border-[#e8e3dd] rounded-xl p-4 flex flex-col items-center justify-center gap-1 shadow-sm active:scale-95 transition-transform">
+            <ClipboardList size={18} className="text-[#3d332e]/40 mb-1" />
+            <span className="text-xs font-bold text-[#3d332e]">Cotizaciones ({counts.cotizaciones})</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Recent activity / Actividad del sistema */}
+      <div className="bg-white rounded-xl border border-[#e8e3dd] p-5 md:p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-semibold text-[#3d332e] text-base">Actividad del sistema</h2>
-          <button className="text-sm text-[#3d332e]/40 hover:text-[#f15a24] transition-colors">
+          <h2 className="font-bold text-[#3d332e] text-sm md:text-base">Actividad del sistema</h2>
+          <button className="text-xs text-[#3d332e]/40 hover:text-[#f15a24] transition-colors">
             Ver todo
           </button>
         </div>
@@ -153,19 +187,19 @@ export default function DashboardPage() {
               key={item.initials + item.time}
               className="flex items-center gap-4 py-4 group cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-full bg-[#3d332e] flex items-center justify-center text-white text-xs font-bold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-[#3d332e] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                 {item.initials}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-[#3d332e]">
+                <p className="text-xs md:text-sm text-[#3d332e]">
                   <span className="font-semibold">{item.name}</span>{" "}
                   {item.action}{" "}
                   <span className="font-semibold">{item.target}</span>
                 </p>
-                <p className="text-xs text-[#3d332e]/40 mt-0.5">{item.time}</p>
+                <p className="text-[10px] text-[#3d332e]/40 mt-0.5">{item.time}</p>
               </div>
               <ChevronRight
-                size={16}
+                size={14}
                 className="text-[#3d332e]/20 group-hover:text-[#3d332e]/50 transition-colors shrink-0"
               />
             </div>

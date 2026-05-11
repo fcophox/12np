@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Plus, Search, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { FileText, Plus, Search, MoreHorizontal, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { useArticulos, Articulo } from "@/context/ArticulosContext";
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -155,7 +155,7 @@ function ArticleCard({ a, onEliminar }: { a: Articulo; onEliminar: (id: string) 
   return (
     <div
       onClick={() => router.push(`/dashboard/articulos/${a.id}/editar`)}
-      className="bg-white rounded-xl border border-[#e8e3dd] p-5 flex flex-col gap-3 hover:shadow-sm transition-shadow cursor-pointer group"
+      className="flex flex-col gap-4 py-6 border-b border-[#3d332e]/5 hover:bg-[#3d332e]/[0.02] transition-colors cursor-pointer group px-2"
     >
       <div className="flex items-start gap-3">
         <div className="w-9 h-9 rounded-lg bg-[#f9f4e8] flex items-center justify-center shrink-0 mt-0.5 relative">
@@ -272,52 +272,57 @@ export default function ArticulosPage() {
     <div className="p-5 md:p-10 pb-36 md:pb-10">
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4">
-        <div className="hidden md:block">
-          <h1 className="text-xl font-bold text-[#3d332e] mb-2">Artículos</h1>
-          <p className="text-[#3d332e]/60 text-base">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Link href="/dashboard" className="md:hidden text-[#3d332e]/40">
+              <ArrowLeft size={18} />
+            </Link>
+            <h1 className="text-xl md:text-2xl font-bold text-[#3d332e]">Artículos</h1>
+          </div>
+          <p className="text-[#3d332e]/60 text-sm md:text-base">
             Gestiona y publica el contenido de tu plataforma.
           </p>
         </div>
         <Link
           href="/dashboard/articulos/nuevo"
-          className="hidden md:flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
+          className="hidden md:flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-lg shadow-[#3d332e]/10"
         >
           <Plus size={16} />
           Nuevo artículo
         </Link>
       </div>
 
-      {/* Search */}
+      {/* Search - Flat */}
       {articulos.length > 0 && (
-        <div className="relative mb-8 max-w-sm">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3d332e]/30" />
+        <div className="relative mb-10 max-w-sm">
+          <Search size={16} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#3d332e]/30" />
           <input
             type="text"
             placeholder="Buscar artículos..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-[#e8e3dd] bg-white text-sm text-[#3d332e] placeholder:text-[#3d332e]/30 focus:outline-none focus:ring-2 focus:ring-[#f15a24]/20 focus:border-[#f15a24] transition"
+            className="w-full pl-8 pr-4 py-2 bg-transparent border-b border-[#3d332e]/10 text-sm text-[#3d332e] placeholder:text-[#3d332e]/20 focus:outline-none focus:border-[#f15a24] transition-colors"
           />
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty state - Flat */}
       {articulos.length === 0 && (
-        <div className="bg-white rounded-xl border border-[#e8e3dd] flex flex-col items-center justify-center py-24 px-6 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#f9f4e8] flex items-center justify-center mb-6">
-            <FileText size={28} className="text-[#f15a24]" />
+        <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-[#3d332e]/5 flex items-center justify-center mb-6">
+            <FileText size={28} className="text-[#3d332e]/20" />
           </div>
           <h2 className="text-xl font-bold text-[#3d332e] mb-2">
             Aún no hay artículos
           </h2>
-          <p className="text-sm text-[#3d332e]/50 max-w-xs mb-8">
+          <p className="text-sm text-[#3d332e]/40 max-w-xs mb-10">
             Crea tu primer artículo para empezar a compartir contenido con tu comunidad.
           </p>
           <Link
             href="/dashboard/articulos/nuevo"
-            className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+            className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-8 py-3.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-[#3d332e]/10"
           >
-            <Plus size={16} />
+            <Plus size={18} />
             Crear primer artículo
           </Link>
         </div>

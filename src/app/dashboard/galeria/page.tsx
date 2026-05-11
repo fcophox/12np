@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Link from "next/link";
 import { useGaleria, GaleriaImagen } from "@/context/GaleriaContext";
 import { 
   ImageIcon, 
@@ -9,6 +10,7 @@ import {
   Loader2, 
   ChevronRight, 
   ChevronLeft,
+  ArrowLeft,
   Sparkles,
   Heart,
   Hammer,
@@ -83,30 +85,30 @@ function GaleriaSection({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-end justify-between px-1">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-[#f9f4e8] rounded-lg text-[#f15a24]">
-              <cat.icon size={16} />
-            </div>
-            <h3 className="font-bold text-[#3d332e] text-lg">{cat.label}</h3>
+            {/* <div className="text-[#f15a24]">
+              <cat.icon size={18} />
+            </div> */}
+            <h3 className="font-bold text-[#3d332e] text-md">{cat.label}</h3>
           </div>
-          <p className="text-xs text-[#3d332e]/40 font-medium">{cat.description}</p>
+          <p className="text-xs text-[#3d332e]/40 font-medium max-w-md">{cat.description}</p>
         </div>
         
         <div className="flex items-center gap-2">
           <button 
             onClick={() => scroll('left')}
-            className="p-2 bg-white border border-[#e8e3dd] rounded-full text-[#3d332e]/40 hover:text-[#3d332e] transition-colors shadow-sm"
+            className="p-2 text-[#3d332e]/40 hover:text-[#3d332e] transition-colors"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={20} />
           </button>
           <button 
             onClick={() => scroll('right')}
-            className="p-2 bg-white border border-[#e8e3dd] rounded-full text-[#3d332e]/40 hover:text-[#3d332e] transition-colors shadow-sm"
+            className="p-2 text-[#3d332e]/40 hover:text-[#3d332e] transition-colors"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={20} />
           </button>
         </div>
       </div>
@@ -116,10 +118,10 @@ function GaleriaSection({
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-1 px-1 snap-x"
         >
-          {/* Upload Button Card */}
+          {/* Upload Button Card - Flat */}
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="shrink-0 w-48 aspect-[4/5] bg-white border-2 border-dashed border-[#e8e3dd] rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-[#f15a24]/30 hover:bg-[#fdfbf7] transition-all group/upload snap-start"
+            className="shrink-0 w-48 aspect-[4/5] bg-[#3d332e]/5 rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-[#3d332e]/10 transition-all group/upload snap-start"
           >
             <input 
               type="file" 
@@ -131,18 +133,18 @@ function GaleriaSection({
             {isUploading ? (
               <Loader2 size={24} className="text-[#f15a24] animate-spin" />
             ) : (
-              <div className="w-12 h-12 rounded-2xl bg-[#f9f4e8] flex items-center justify-center text-[#3d332e]/20 group-hover/upload:text-[#f15a24] group-hover/upload:scale-110 transition-all">
-                <Plus size={24} />
+              <div className="w-12 h-12 flex items-center justify-center text-[#3d332e]/20 group-hover/upload:text-[#f15a24] group-hover/upload:scale-110 transition-all">
+                <Plus size={32} />
               </div>
             )}
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/40 group-hover/upload:text-[#f15a24]">Agregar Imagen</p>
           </div>
 
-          {/* Images List */}
+          {/* Images List - Flat */}
           {imagenes.map((img) => (
             <div 
               key={img.id} 
-              className="shrink-0 w-48 aspect-[4/5] bg-white rounded-3xl border border-[#e8e3dd] overflow-hidden relative group/img shadow-sm snap-start"
+              className="shrink-0 w-48 aspect-[4/5] rounded-3xl overflow-hidden relative group/img snap-start"
             >
               <Image 
                 src={img.url} 
@@ -224,11 +226,16 @@ export default function GaleriaPage() {
   return (
     <div className="p-5 md:p-10 pb-36 md:pb-10 space-y-16">
       {/* Header */}
-      <div className="hidden md:block">
-        <h1 className="text-4xl font-bold text-[#3d332e] mb-2 font-[family-name:var(--font-fraunces)]">
-          Galería multicategoría
-        </h1>
-        <p className="text-[#3d332e]/60 text-base">
+      <div className="mb-10 md:mb-16">
+        <div className="flex items-center gap-2 mb-2">
+          <Link href="/dashboard" className="md:hidden text-[#3d332e]/40">
+            <ArrowLeft size={18} />
+          </Link>
+          <h1 className="text-xl md:text-2xl font-bold text-[#3d332e]">
+            Galería multicategoría
+          </h1>
+        </div>
+        <p className="text-[#3d332e]/60 text-sm md:text-base">
           Organiza y actualiza las imágenes dinámicas de todo el sitio web.
         </p>
       </div>

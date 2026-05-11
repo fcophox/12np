@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Plus, Star, MoreHorizontal, Pencil, Trash2, PauseCircle, PlayCircle } from "lucide-react";
+import { ShoppingBag, Plus, Star, MoreHorizontal, Pencil, Trash2, PauseCircle, PlayCircle, ArrowLeft } from "lucide-react";
 import { useProductos, Producto } from "@/context/ProductosContext";
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -146,10 +146,10 @@ function ProductCard({
   return (
     <div
       onClick={() => router.push(`/dashboard/productos/${p.id}`)}
-      className={`bg-white border-b border-[#e8e3dd] flex items-center gap-4 px-4 py-3 hover:bg-[#fdfbf7] transition-colors cursor-pointer ${p.pausado ? "opacity-50" : ""}`}
+      className={`flex items-start md:items-center gap-4 px-2 py-4 hover:bg-[#3d332e]/5 transition-colors cursor-pointer rounded-xl group ${p.pausado ? "opacity-50" : ""}`}
     >
       {/* Imagen miniatura */}
-      <div className="w-10 h-10 rounded-lg bg-[#f9f4e8] shrink-0 overflow-hidden relative">
+      <div className="w-12 h-12 md:w-10 md:h-10 rounded-lg bg-[#f9f4e8] shrink-0 overflow-hidden relative mt-1 md:mt-0">
         {p.imagen ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={p.imagen} alt={p.nombre} className="w-full h-full object-cover" />
@@ -160,7 +160,7 @@ function ProductCard({
         )}
       </div>
 
-      {/* Nombre + frase */}
+      {/* Nombre + frase + mobile details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-semibold text-[#3d332e] truncate">{p.nombre}</p>
@@ -174,9 +174,19 @@ function ProductCard({
           )}
         </div>
         {p.frase && <p className="text-xs text-[#3d332e]/40 truncate mt-0.5">{p.frase}</p>}
+        
+        {/* Mobile only: Price and Order stacking */}
+        <div className="flex items-center gap-3 mt-2 md:hidden">
+          {p.precio != null ? (
+            <p className="text-xs font-bold text-[#3d332e]">${p.precio.toLocaleString("es-CL")} <span className="text-[9px] font-normal text-[#3d332e]/30">CLP</span></p>
+          ) : (
+            <p className="text-[10px] text-[#3d332e]/20">—</p>
+          )}
+          <span className="text-[10px] text-[#3d332e]/30">#{p.orden}</span>
+        </div>
       </div>
 
-      {/* Etiquetas */}
+      {/* Etiquetas - desktop only */}
       <div className="hidden md:flex items-center gap-1.5 shrink-0">
         {p.etiqueta && (
           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#3d332e] text-white">{p.etiqueta}</span>
@@ -186,8 +196,8 @@ function ProductCard({
         ))}
       </div>
 
-      {/* Precio */}
-      <div className="shrink-0 text-right min-w-[80px]">
+      {/* Precio - desktop only */}
+      <div className="hidden md:block shrink-0 text-right min-w-[80px]">
         {p.precio != null ? (
           <p className="text-sm font-bold text-[#3d332e]">${p.precio.toLocaleString("es-CL")}<span className="text-[10px] font-normal text-[#3d332e]/30 ml-0.5">CLP</span></p>
         ) : (
@@ -195,11 +205,11 @@ function ProductCard({
         )}
       </div>
 
-      {/* Orden */}
-      <span className="text-[10px] text-[#3d332e]/30 shrink-0 w-6 text-center">#{p.orden}</span>
+      {/* Orden - desktop only */}
+      <span className="hidden md:block text-[10px] text-[#3d332e]/30 shrink-0 w-6 text-center">#{p.orden}</span>
 
       {/* Menú */}
-      <div className="shrink-0 relative" onClick={(e) => e.stopPropagation()}>
+      <div className="shrink-0 relative mt-1 md:mt-0" onClick={(e) => e.stopPropagation()}>
         <button
           ref={btnRef}
           onClick={() => setOpen((v) => !v)}
@@ -266,50 +276,58 @@ export default function ProductosPage() {
   return (
     <div className="p-5 md:p-10 pb-36 md:pb-10">
       <div className="flex items-start justify-between mb-8 md:mb-10 gap-4">
-        <div className="hidden md:block">
-          <h1 className="text-xl font-bold text-[#3d332e] mb-2">Productos</h1>
-          <p className="text-[#3d332e]/60 text-base">Administra el catálogo de productos de tu plataforma.</p>
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Link href="/dashboard" className="md:hidden text-[#3d332e]/40">
+              <ArrowLeft size={18} />
+            </Link>
+            <h1 className="text-xl md:text-2xl font-bold text-[#3d332e]">Productos</h1>
+          </div>
+          <p className="text-[#3d332e]/60 text-sm md:text-base">Administra el catálogo de productos de tu plataforma.</p>
         </div>
         <Link
           href="/dashboard/productos/nuevo"
-          className="hidden md:flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
+          className="hidden md:flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-lg shadow-[#3d332e]/10"
         >
           <Plus size={16} />
           Nuevo producto
         </Link>
       </div>
 
+      {/* Empty state - Flat */}
       {productos.length === 0 && (
-        <div className="bg-white rounded-xl border border-[#e8e3dd] flex flex-col items-center justify-center py-24 px-6 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#f9f4e8] flex items-center justify-center mb-6">
-            <ShoppingBag size={28} className="text-[#f15a24]" />
+        <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-[#3d332e]/5 flex items-center justify-center mb-6">
+            <ShoppingBag size={28} className="text-[#3d332e]/20" />
           </div>
           <h2 className="text-xl font-bold text-[#3d332e] mb-2">Aún no hay productos</h2>
-          <p className="text-sm text-[#3d332e]/50 max-w-xs mb-8">Agrega tu primer producto para comenzar a construir tu catálogo.</p>
+          <p className="text-sm text-[#3d332e]/40 max-w-xs mb-10">Agrega tu primer producto para comenzar a construir tu catálogo.</p>
           <Link
             href="/dashboard/productos/nuevo"
-            className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+            className="flex items-center gap-2 bg-[#3d332e] hover:bg-[#2a2220] text-[#fdfbf7] text-sm font-semibold px-8 py-3.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-[#3d332e]/10"
           >
-            <Plus size={16} />
+            <Plus size={18} />
             Agregar primer producto
           </Link>
         </div>
       )}
 
       {productos.length > 0 && (
-        <div className="bg-white rounded-xl border border-[#e8e3dd] overflow-hidden">
-          {/* Header row */}
-          <div className="flex items-center gap-4 px-4 py-2.5 border-b border-[#e8e3dd] bg-[#fdfbf7]">
+        <div className="flex flex-col">
+          {/* Header row - Desktop only */}
+          <div className="hidden md:flex items-center gap-4 px-2 py-3 border-b border-[#3d332e]/5">
             <div className="w-10 shrink-0" />
-            <p className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30">Producto</p>
-            <p className="hidden md:block text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30 shrink-0">Etiquetas</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30 shrink-0 min-w-[80px] text-right">Precio</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30 shrink-0 w-6 text-center">Ord.</p>
+            <p className="flex-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#3d332e]/30">Producto</p>
+            <p className="hidden md:block text-[10px] font-bold uppercase tracking-[0.2em] text-[#3d332e]/30 shrink-0">Etiquetas</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#3d332e]/30 shrink-0 min-w-[80px] text-right">Precio</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#3d332e]/30 shrink-0 w-6 text-center">Ord.</p>
             <div className="w-8 shrink-0" />
           </div>
-          {productos.map((p) => (
-            <ProductCard key={p.id} p={p} onEliminar={handleEliminarClick} onPausar={pausarProducto} />
-          ))}
+          <div className="divide-y divide-[#3d332e]/5">
+            {productos.map((p) => (
+              <ProductCard key={p.id} p={p} onEliminar={handleEliminarClick} onPausar={pausarProducto} />
+            ))}
+          </div>
         </div>
       )}
 

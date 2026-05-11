@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCotizaciones, Cotizacion } from "@/context/CotizacionesContext";
 import { useProductos } from "@/context/ProductosContext";
 import { sendReplyEmail } from "@/app/actions/emailActions";
@@ -19,7 +20,8 @@ import {
   MessageSquare,
   ChevronRight,
   Send,
-  Loader2
+  Loader2,
+  ArrowLeft
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -333,9 +335,9 @@ function CotizacionRow({
   return (
     <div 
       onClick={onClick}
-      className={`group border-b border-[#e8e3dd] last:border-0 transition-colors cursor-pointer ${!c.leido ? "bg-[#fdfbf7]" : "bg-white hover:bg-[#fcfaf8]"}`}
+      className={`group transition-colors cursor-pointer rounded-xl px-2 ${!c.leido ? "bg-[#3d332e]/5" : "hover:bg-[#3d332e]/[0.02]"}`}
     >
-      <div className="flex items-center gap-4 px-4 py-4">
+      <div className="flex items-center gap-4 py-4">
         {/* Status Icon */}
         <button 
           onClick={(e) => {
@@ -417,11 +419,15 @@ export default function CotizacionesPage() {
   if (loading) {
     return (
       <div className="p-5 md:p-10 animate-pulse">
-        <div className="hidden md:block mb-10">
+        <div className="mb-10">
           <div className="h-10 w-72 bg-[#3d332e]/5 rounded-lg mb-2" />
           <div className="h-4 w-96 bg-[#3d332e]/5 rounded-lg" />
         </div>
-        <div className="bg-white rounded-xl border border-[#e8e3dd] h-96" />
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="h-20 bg-[#3d332e]/[0.02] rounded-xl" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -430,19 +436,24 @@ export default function CotizacionesPage() {
     <div className="p-5 md:p-10 pb-36 md:pb-10">
       {/* Header */}
       <div className="flex items-start justify-between mb-8 md:mb-10 gap-4">
-        <div className="hidden md:block">
-          <h1 className="text-xl font-bold text-[#3d332e] mb-2">
-            Cotizaciones Pymes & Empresas
-          </h1>
-          <p className="text-[#3d332e]/60 text-base">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Link href="/dashboard" className="md:hidden text-[#3d332e]/40">
+              <ArrowLeft size={18} />
+            </Link>
+            <h1 className="text-xl md:text-2xl font-bold text-[#3d332e]">
+              Cotizaciones Pymes & Empresas
+            </h1>
+          </div>
+          <p className="text-[#3d332e]/60 text-sm md:text-base">
             Gestiona las solicitudes de cotización para Pymes y Empresas.
           </p>
         </div>
       </div>
 
       {cotizaciones.length === 0 ? (
-        <div className="bg-white rounded-xl border border-[#e8e3dd] flex flex-col items-center justify-center py-24 px-6 text-center shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-[#f9f4e8] flex items-center justify-center mb-6">
+        <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-[#3d332e]/5 flex items-center justify-center mb-6">
             <Building2 size={28} className="text-[#3d332e]/20" />
           </div>
           
@@ -450,23 +461,23 @@ export default function CotizacionesPage() {
             <h2 className="text-xl font-bold text-[#3d332e]">
               Sin solicitudes aún
             </h2>
-            <p className="text-sm text-[#3d332e]/50 leading-relaxed">
+            <p className="text-sm text-[#3d332e]/40 leading-relaxed">
               Las cotizaciones que envíen las empresas desde el portal corporativo aparecerán aquí.
             </p>
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-[#e8e3dd] overflow-hidden shadow-sm">
-          {/* Table Header */}
-          <div className="hidden md:flex items-center gap-4 px-4 py-3 bg-[#fdfbf7] border-b border-[#e8e3dd]">
+        <div className="flex flex-col">
+          {/* Table Header - Desktop Only */}
+          <div className="hidden md:flex items-center gap-4 px-4 py-3 border-b border-[#3d332e]/5">
             <div className="w-[18px] shrink-0" />
-            <p className="flex-1 text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30">Empresa / Contacto</p>
-            <p className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/30 w-32 text-right">Fecha Solicitud</p>
+            <p className="flex-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#3d332e]/30">Empresa / Contacto</p>
+            <p className="shrink-0 text-[10px] font-bold uppercase tracking-[0.2em] text-[#3d332e]/30 w-32 text-right">Fecha Solicitud</p>
             <div className="w-14 shrink-0" />
           </div>
 
           {/* List */}
-          <div className="flex flex-col">
+          <div className="divide-y divide-[#3d332e]/5">
             {cotizaciones.map((c) => (
               <CotizacionRow 
                 key={c.id} 

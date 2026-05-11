@@ -275,42 +275,9 @@ function DashboardContent({
             {title}
           </p>
 
-          {/* Right: settings icon with dropdown */}
-          <div className="relative">
-            <button 
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className={`w-8 h-8 flex items-center justify-center transition-colors ${showMobileMenu ? 'text-[#f15a24]' : 'text-[#3d332e]/40'}`}
-            >
-              <Settings size={18} />
-            </button>
+          {/* Right: empty for balance */}
+          <div className="w-8" />
 
-            {showMobileMenu && (
-              <>
-                <div 
-                  className="fixed inset-0 z-40 bg-black/5" 
-                  onClick={() => setShowMobileMenu(false)}
-                />
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl border border-[#e8e3dd] shadow-xl z-50 overflow-hidden animate-fade-in-up [animation-duration:200ms]">
-                  <Link 
-                    href="/dashboard/cotizaciones" 
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#3d332e] hover:bg-[#f9f4e8] transition-colors"
-                  >
-                    <ClipboardList size={16} className="text-[#3d332e]/40" />
-                    <span>Cotizaciones</span>
-                  </Link>
-                  <Link 
-                    href="/dashboard/contacto" 
-                    onClick={() => setShowMobileMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-[#3d332e] hover:bg-[#f9f4e8] transition-colors border-t border-[#f5f5f5]"
-                  >
-                    <MessageSquare size={16} className="text-[#3d332e]/40" />
-                    <span>Contacto</span>
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
         </div>
 
         <div className="flex-1 w-full max-w-5xl mx-auto">
@@ -330,25 +297,27 @@ function DashboardContent({
 
       {/* Mobile bottom nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#e8e3dd] flex items-center justify-around px-2 h-16 safe-area-pb">
-        {primaryNavItems.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
-          return (
-            <Link
-              key={href}
-              href={href}
-              className="flex flex-col items-center justify-center gap-1 flex-1 py-2"
-            >
-              <Icon
-                size={22}
-                className={`transition-colors ${active ? "text-[#3d332e]" : "text-[#3d332e]/30"}`}
-                strokeWidth={active ? 2.2 : 1.8}
-              />
-              <span className={`text-[10px] font-medium transition-colors ${active ? "text-[#3d332e]" : "text-[#3d332e]/30"}`}>
-                {label}
-              </span>
-            </Link>
-          );
-        })}
+        {primaryNavItems
+          .filter(item => item.label !== "Perfil")
+          .map(({ label, href, icon: Icon }) => {
+            const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                className="flex flex-col items-center justify-center gap-1 flex-1 py-2"
+              >
+                <Icon
+                  size={22}
+                  className={`transition-colors ${active ? "text-[#3d332e]" : "text-[#3d332e]/30"}`}
+                  strokeWidth={active ? 2.2 : 1.8}
+                />
+                <span className={`text-[10px] font-medium transition-colors ${active ? "text-[#3d332e]" : "text-[#3d332e]/30"}`}>
+                  {label}
+                </span>
+              </Link>
+            );
+          })}
       </nav>
     </div>
   );
