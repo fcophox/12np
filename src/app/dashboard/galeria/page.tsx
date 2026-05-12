@@ -20,6 +20,7 @@ import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import Image from "next/image";
 import DeleteModal from "@/components/DeleteModal";
+import { optimizeImage } from "@/utils/image-optimization";
 
 type Categoria = "hero" | "recuerdos" | "artesanal";
 
@@ -52,7 +53,7 @@ function GaleriaSection({
 }: { 
   cat: typeof CATEGORIES[0]; 
   imagenes: GaleriaImagen[]; 
-  onUpload: (file: File, categoria: Categoria) => Promise<void>;
+  onUpload: (files: FileList, categoria: Categoria) => Promise<number>;
   onDelete: (id: string) => Promise<void>;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -60,13 +61,17 @@ function GaleriaSection({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setIsUploading(true);
     try {
-      await onUpload(file, cat.id);
-      toast.success("Imagen subida correctamente");
+      const count = await onUpload(files, cat.id);
+      if (count > 0) {
+        toast.success(`${count} imagen(es) subida(s) correctamente`);
+      } else {
+        toast.error("No se pudo subir ninguna imagen");
+      }
     } catch (error) {
       toast.error("Error al subir imagen");
       console.error(error);
@@ -93,6 +98,9 @@ function GaleriaSection({
               <cat.icon size={18} />
             </div> */}
             <h3 className="font-bold text-[#3d332e] text-md">{cat.label}</h3>
+            <span className="px-2 py-0.5 bg-[#3d332e]/5 text-[#3d332e]/40 text-[10px] font-bold rounded-full">
+              {imagenes.length}
+            </span>
           </div>
           <p className="text-xs text-[#3d332e]/40 font-medium max-w-md">{cat.description}</p>
         </div>
@@ -129,6 +137,7 @@ function GaleriaSection({
               onChange={handleFileChange} 
               className="hidden" 
               accept="image/*"
+              multiple
             />
             {isUploading ? (
               <Loader2 size={24} className="text-[#f15a24] animate-spin" />
@@ -137,7 +146,7 @@ function GaleriaSection({
                 <Plus size={32} />
               </div>
             )}
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/40 group-hover/upload:text-[#f15a24]">Agregar Imagen</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#3d332e]/40 group-hover/upload:text-[#f15a24]">Carga Masiva</p>
           </div>
 
           {/* Images List - Flat */}
@@ -172,30 +181,45 @@ function GaleriaSection({
 }
 
 export default function GaleriaPage() {
-  const { imagenes, loading, agregarImagen, eliminarImagen } = useGaleria();
+  const { imagenes, loading, agregarImagenes, eliminarImagen } = useGaleria();
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: string | null }>({
     isOpen: false,
     id: null,
   });
 
-  const handleUpload = async (file: File, categoria: Categoria) => {
+  const handleUpload = async (files: FileList, categoria: Categoria) => {
     const supabase = createClient();
-    
-    // 1. Upload to Storage
-    const fileName = `${categoria}/${Date.now()}-${file.name.replace(/\s/g, '_')}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("galeria")
-      .upload(fileName, file);
+    const urls: string[] = [];
 
-    if (uploadError) throw uploadError;
+    for (const file of Array.from(files)) {
+      // 1. Optimize Image
+      const optimizedFile = await optimizeImage(file);
+      
+      // 2. Upload to Storage
+      const fileName = `${categoria}/${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("galeria")
+        .upload(fileName, optimizedFile);
 
-    // 2. Get Public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from("galeria")
-      .getPublicUrl(fileName);
+      if (uploadError) {
+        console.error(`Error uploading ${file.name}:`, uploadError);
+        continue;
+      }
 
-    // 3. Save to Table
-    await agregarImagen(publicUrl, categoria);
+      // 3. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("galeria")
+        .getPublicUrl(fileName);
+      
+      urls.push(publicUrl);
+    }
+
+    // 4. Save to Table (Batch)
+    if (urls.length > 0) {
+      await agregarImagenes(urls, categoria);
+    }
+
+    return urls.length;
   };
 
   const handleDelete = async () => {
@@ -234,6 +258,9 @@ export default function GaleriaPage() {
           <h1 className="text-xl md:text-2xl font-bold text-[#3d332e]">
             Galería multicategoría
           </h1>
+          <span className="px-2.5 py-1 bg-[#f15a24]/10 text-[#f15a24] text-xs font-bold rounded-full">
+            {imagenes.length}
+          </span>
         </div>
         <p className="text-[#3d332e]/60 text-sm md:text-base">
           Organiza y actualiza las imágenes dinámicas de todo el sitio web.

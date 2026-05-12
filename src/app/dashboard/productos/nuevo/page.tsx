@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChevronRight, ImagePlus, Save } from "lucide-react";
 import { useProductos } from "@/context/ProductosContext";
 import { toast } from "sonner";
+import { optimizeImage } from "@/utils/image-optimization";
 
 export default function NuevoProductoPage() {
   const router = useRouter();
@@ -45,10 +46,11 @@ export default function NuevoProductoPage() {
     }
   };
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
+    const optimized = await optimizeImage(file);
     const reader = new FileReader();
     reader.onload = (e) => setImagen(e.target?.result as string);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(optimized);
   };
 
   const handleDrop = useCallback((e: React.DragEvent) => {

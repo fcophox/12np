@@ -15,6 +15,7 @@ interface GaleriaContextType {
   imagenes: GaleriaImagen[];
   loading: boolean;
   agregarImagen: (url: string, categoria: "hero" | "recuerdos" | "artesanal") => Promise<void>;
+  agregarImagenes: (urls: string[], categoria: "hero" | "recuerdos" | "artesanal") => Promise<void>;
   eliminarImagen: (id: string) => Promise<void>;
   recargarGaleria: () => Promise<void>;
 }
@@ -23,6 +24,7 @@ const GaleriaContext = createContext<GaleriaContextType>({
   imagenes: [],
   loading: true,
   agregarImagen: async () => {},
+  agregarImagenes: async () => {},
   eliminarImagen: async () => {},
   recargarGaleria: async () => {},
 });
@@ -93,6 +95,45 @@ export function GaleriaProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const agregarImagenes = async (urls: string[], categoria: "hero" | "recuerdos" | "artesanal") => {
+    const supabase = createClient();
+    
+    // Get max order for this category
+    const { data: maxData } = await supabase
+      .from("galeria")
+      .select("orden")
+      .eq("categoria", categoria)
+      .order("orden", { ascending: false })
+      .limit(1);
+    
+    let currentOrder = (maxData?.[0]?.orden || 0);
+
+    const inserts = urls.map(url => ({
+      url,
+      categoria,
+      orden: ++currentOrder
+    }));
+
+    const { data, error } = await supabase
+      .from("galeria")
+      .insert(inserts)
+      .select();
+
+    if (error) throw error;
+    if (data) {
+      setImagenes(prev => [
+        ...prev,
+        ...data.map(img => ({
+          id: img.id,
+          url: img.url,
+          categoria: img.categoria,
+          orden: img.orden,
+          creadoEn: img.created_at
+        }))
+      ]);
+    }
+  };
+
   const eliminarImagen = async (id: string) => {
     const supabase = createClient();
     const { error } = await supabase
@@ -109,6 +150,7 @@ export function GaleriaProvider({ children }: { children: ReactNode }) {
       imagenes, 
       loading, 
       agregarImagen, 
+      agregarImagenes,
       eliminarImagen,
       recargarGaleria: () => loadGaleria() 
     }}>

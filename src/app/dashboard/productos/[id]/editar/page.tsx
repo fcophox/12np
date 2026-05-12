@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { ChevronRight, ImagePlus, Save } from "lucide-react";
 import { useProductos, Producto } from "@/context/ProductosContext";
 import { toast } from "sonner";
+import { optimizeImage } from "@/utils/image-optimization";
 
 export default function EditarProductoPage() {
   const router = useRouter();
@@ -60,10 +61,11 @@ export default function EditarProductoPage() {
     else if (e.key === "Backspace" && etiquetaInput === "" && etiquetas.length > 0) setEtiquetas((prev) => prev.slice(0, -1));
   };
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
+    const optimized = await optimizeImage(file);
     const reader = new FileReader();
     reader.onload = (e) => setImagen(e.target?.result as string);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(optimized);
   };
 
   const handleDrop = useCallback((e: React.DragEvent) => {

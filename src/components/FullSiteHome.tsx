@@ -171,8 +171,8 @@ function NewsCarousel() {
   const animRef = useRef<number | null>(null);
   const posRef = useRef(0);
   const currentSpeedRef = useRef(0);
-  const targetSpeedRef = useRef(0.5);
-  const maxSpeed = 0.5;
+  const targetSpeedRef = useRef(1.2);
+  const maxSpeed = 1.5;
 
   const [images, setImages] = useState<any[]>(NEWS_ITEMS);
 
@@ -217,13 +217,13 @@ function NewsCarousel() {
   return (
     <section className="w-full py-24 space-y-8 overflow-hidden px-8 md:px-16">
       <BlurFadeIn className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-8">
-        <div className="space-y-6 max-w-2xl">
+        <div className="space-y-6 max-w-3xl">
           <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">Creado con amor • desde 2001</span>
           <h2 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] leading-tight text-[#1a1a1a]">Sabores intensos, ingredientes locales, creado con amor</h2>
         </div>
       </BlurFadeIn>
       <div className="w-screen -mx-8 md:-mx-16 overflow-hidden">
-        <div ref={trackRef} className="flex gap-12 items-center w-max px-[10vw]">
+        <div ref={trackRef} className="flex gap-12 items-center w-max px-[10vw] mt-6">
           {[...images, ...images, ...images, ...images].map((item, i) => {
             const rotations = [2, -1.5, 1, -2.5, 1.8, -1, 2.2, -1.8, 1.2, -2];
             const rot = rotations[i % rotations.length];
@@ -270,7 +270,7 @@ function BlogSkeleton() {
         </div>
         
         <div className="flex flex-col gap-10">
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex gap-6 items-start">
               <div className="w-32 h-32 md:w-36 md:h-24 bg-[#e8e3dd] animate-pulse rounded-3xl flex-shrink-0" />
               <div className="space-y-3 pt-1 flex-1">
@@ -319,7 +319,7 @@ function BlogSection() {
           .select("*")
           .eq("estado", "publicado")
           .order("created_at", { ascending: false })
-          .limit(3);
+          .limit(4);
 
         if (featured?.id) {
           query = query.neq("id", featured.id);

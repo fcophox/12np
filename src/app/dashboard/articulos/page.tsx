@@ -278,6 +278,9 @@ export default function ArticulosPage() {
               <ArrowLeft size={18} />
             </Link>
             <h1 className="text-xl md:text-2xl font-bold text-[#3d332e]">Artículos</h1>
+            <span className="px-2.5 py-1 bg-[#3d332e]/5 text-[#3d332e]/40 text-xs font-bold rounded-full">
+              {articulos.length}
+            </span>
           </div>
           <p className="text-[#3d332e]/60 text-sm md:text-base">
             Gestiona y publica el contenido de tu plataforma.

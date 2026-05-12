@@ -8,6 +8,7 @@ import RichEditor from "@/components/RichEditor";
 import { useArticulos, Articulo } from "@/context/ArticulosContext";
 import { useBrand } from "@/context/BrandContext";
 import { toast } from "sonner";
+import { optimizeImage } from "@/utils/image-optimization";
 
 function slugify(text: string) {
   return text
@@ -77,10 +78,11 @@ export default function EditarArticuloPage() {
     setSlug(e.target.value);
   };
 
-  const handleImageFile = (file: File, setter: (s: string) => void) => {
+  const handleImageFile = async (file: File, setter: (s: string) => void) => {
+    const optimized = await optimizeImage(file);
     const reader = new FileReader();
     reader.onload = (e) => setter(e.target?.result as string);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(optimized);
   };
 
   const handleCoverDrop = useCallback((e: React.DragEvent) => {
