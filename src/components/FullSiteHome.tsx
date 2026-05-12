@@ -247,6 +247,45 @@ function NewsCarousel() {
   );
 }
 
+function BlogSkeleton() {
+  return (
+    <section className="w-full bg-[#f9f4e8] py-24 px-8 md:px-16 space-y-16">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-8">
+        <div className="space-y-6 max-w-2xl w-full">
+          <div className="h-3 w-48 bg-[#e8e3dd] animate-pulse rounded-full" />
+          <div className="h-10 w-3/4 bg-[#e8e3dd] animate-pulse rounded-2xl" />
+          <div className="h-4 w-full bg-[#e8e3dd] animate-pulse rounded-full" />
+        </div>
+        <div className="hidden md:block h-12 w-40 bg-[#e8e3dd] animate-pulse rounded-full" />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-8 max-w-7xl mx-auto">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="relative aspect-[21/9] w-full bg-[#e8e3dd] animate-pulse rounded-[2.5rem]" />
+          <div className="space-y-4">
+            <div className="h-4 w-32 bg-[#e8e3dd] animate-pulse rounded-full" />
+            <div className="h-10 w-2/3 bg-[#e8e3dd] animate-pulse rounded-xl" />
+            <div className="h-4 w-full bg-[#e8e3dd] animate-pulse rounded-full" />
+          </div>
+        </div>
+        
+        <div className="flex flex-col gap-10">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex gap-6 items-start">
+              <div className="w-32 h-32 md:w-36 md:h-24 bg-[#e8e3dd] animate-pulse rounded-3xl flex-shrink-0" />
+              <div className="space-y-3 pt-1 flex-1">
+                <div className="h-4 w-20 bg-[#e8e3dd] animate-pulse rounded-full" />
+                <div className="h-6 w-full bg-[#e8e3dd] animate-pulse rounded-lg" />
+                <div className="h-6 w-3/4 bg-[#e8e3dd] animate-pulse rounded-lg" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function BlogSection() {
   const [featuredPost, setFeaturedPost] = useState<any>(null);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
@@ -299,7 +338,8 @@ function BlogSection() {
     loadBlog();
   }, []);
 
-  if (loading || (!featuredPost && recentPosts.length === 0)) return null;
+  if (loading) return <BlogSkeleton />;
+  if (!featuredPost && recentPosts.length === 0) return null;
 
   return (
     <section className="w-full bg-[#f9f4e8] py-24 px-8 md:px-16 space-y-16">
@@ -321,7 +361,7 @@ function BlogSection() {
             <div className="relative aspect-[21/9] w-full rounded-[2.5rem] overflow-hidden shadow-2xl">
               <Image src={featuredPost.cover_url || "/images/blog/featured.png"} alt={featuredPost.titulo} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
               {featuredPost.categoria && (
-                <div className="absolute top-6 left-6 px-4 py-1.5 bg-[#f15a24] text-white text-xs font-bold rounded-full uppercase tracking-widest">{featuredPost.categoria}</div>
+                <div className="absolute top-6 left-6 px-4 py-1.5 border border-[#74865e] text-[#74865e] bg-white/90 backdrop-blur-sm text-xs font-bold rounded-full uppercase tracking-widest">{featuredPost.categoria}</div>
               )}
             </div>
             <div className="space-y-4">
@@ -344,7 +384,7 @@ function BlogSection() {
               </div>
               <div className="space-y-3 pt-1">
                 {post.categoria && (
-                  <span className="inline-block px-3 py-1 bg-[#f15a24] text-white text-[10px] font-bold rounded-full uppercase tracking-widest">{post.categoria}</span>
+                  <span className="inline-block px-3 py-1 border border-[#74865e] text-[#74865e] text-[10px] font-bold rounded-full uppercase tracking-widest">{post.categoria}</span>
                 )}
                 <h4 className="text-lg font-bold leading-snug group-hover:text-[#f15a24] transition-colors line-clamp-2">{post.titulo}</h4>
               </div>
