@@ -38,8 +38,9 @@ export default function LaPasteleraClient() {
     avatar_url?: string;
     cargo?: string;
   } | null>(null);
-  const [images, setImages] = useState<GalleryImage[]>(GALLERY_IMAGES);
+  const [images, setImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [imagesLoading, setImagesLoading] = useState(true);
 
   useEffect(() => {
     // Author Loading logic
@@ -64,21 +65,30 @@ export default function LaPasteleraClient() {
     };
 
     const loadArtesanalImages = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("galeria")
-        .select("url")
-        .eq("categoria", "artesanal")
-        .order("orden", { ascending: true });
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("galeria")
+          .select("url")
+          .eq("categoria", "artesanal")
+          .order("orden", { ascending: true });
 
-      if (!error && data && data.length > 0) {
-        const heights = [700, 400, 600, 500, 800, 450, 650, 400, 600];
-        setImages(data.map((img, i) => ({
-          src: img.url,
-          w: 500,
-          h: heights[i % heights.length],
-          alt: "Momento artesanal 12enpunto"
-        })));
+        if (!error && data && data.length > 0) {
+          const heights = [700, 400, 600, 500, 800, 450, 650, 400, 600];
+          setImages(data.map((img, i) => ({
+            src: img.url,
+            w: 500,
+            h: heights[i % heights.length],
+            alt: "Momento artesanal 12enpunto"
+          })));
+        } else {
+          setImages(GALLERY_IMAGES);
+        }
+      } catch (err) {
+        console.error("Error loading artesanal images:", err);
+        setImages(GALLERY_IMAGES);
+      } finally {
+        setImagesLoading(false);
       }
     };
 
@@ -204,23 +214,35 @@ export default function LaPasteleraClient() {
 
           {/* Desktop: Masonry */}
           <div className="hidden md:block columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-            {images.map((img, i) => (
-              <BlurFadeIn key={i} delay={(i % 3) * 0.1} yOffset={16}>
-                <div className="break-inside-avoid group relative rounded-[2rem] overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
-                  <Image src={img.src} alt={img.alt} width={img.w} height={img.h} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110" />
-                </div>
-              </BlurFadeIn>
-            ))}
+            {imagesLoading ? (
+              [1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="break-inside-avoid relative rounded-[2rem] overflow-hidden bg-gray-100 animate-pulse" style={{ height: `${[300, 450, 350, 500, 400, 300][i % 6]}px` }} />
+              ))
+            ) : (
+              images.map((img, i) => (
+                <BlurFadeIn key={i} delay={(i % 3) * 0.1} yOffset={16}>
+                  <div className="break-inside-avoid group relative rounded-[2rem] overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+                    <Image src={img.src} alt={img.alt} width={img.w} height={img.h} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110" />
+                  </div>
+                </BlurFadeIn>
+              ))
+            )}
           </div>
 
           {/* Mobile: Infinite Carousel */}
           <div className="md:hidden w-screen -mx-8 overflow-hidden">
             <div ref={trackRef} className="flex gap-6 items-center w-max px-[10vw]">
-              {[...images, ...images].map((img, i) => (
-                <div key={i} className="flex-shrink-0 w-[280px] h-[280px] relative rounded-[2.5rem] overflow-hidden shadow-lg">
-                  <Image src={img.src} alt={img.alt} fill className="object-cover" />
-                </div>
-              ))}
+              {imagesLoading ? (
+                [1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex-shrink-0 w-[280px] h-[280px] relative rounded-[2.5rem] overflow-hidden bg-gray-100 animate-pulse" />
+                ))
+              ) : (
+                [...images, ...images].map((img, i) => (
+                  <div key={i} className="flex-shrink-0 w-[280px] h-[280px] relative rounded-[2.5rem] overflow-hidden shadow-lg">
+                    <Image src={img.src} alt={img.alt} fill className="object-cover" />
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

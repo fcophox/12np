@@ -34,6 +34,26 @@ const FALLBACK_PRODUCTS = [
   }
 ];
 
+function ProductsSkeleton() {
+  return (
+    <section className="relative w-full py-8 md:py-32 px-8 md:px-16 overflow-hidden">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+        <div className="flex flex-col gap-10 py-0 md:py-20">
+          {[1, 2].map((i) => (
+            <div key={i} className="relative w-full aspect-square rounded-[3rem] bg-[#e8e3dd] animate-pulse shadow-2xl shadow-black/5" />
+          ))}
+        </div>
+        <div className="hidden md:flex flex-col justify-center h-full py-20 space-y-6">
+          <div className="h-3 w-32 bg-[#e8e3dd] animate-pulse rounded-full" />
+          <div className="h-12 w-3/4 bg-[#e8e3dd] animate-pulse rounded-2xl" />
+          <div className="h-6 w-1/2 bg-[#e8e3dd] animate-pulse rounded-xl" />
+          <div className="h-12 w-40 bg-[#e8e3dd] animate-pulse rounded-full pt-4" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ProductsSection() {
   const [activeProduct, setActiveProduct] = useState(0);
   const [products, setProducts] = useState<any[]>([]);
@@ -85,7 +105,7 @@ function ProductsSection() {
     return () => observer.disconnect();
   }, [loading, products.length]);
 
-  if (loading) return null; // Or a skeleton if preferred
+  if (loading) return <ProductsSkeleton />;
   if (products.length === 0) return null;
 
   return (
@@ -166,82 +186,122 @@ const NEWS_ITEMS = [
   { src: "/images/news/laptop.png", alt: "Laptop", width: "w-[280px] md:w-[320px]", label: "Tu experiencia", aspect: "aspect-square" },
 ];
 
-function NewsCarousel() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const animRef = useRef<number | null>(null);
-  const posRef = useRef(0);
-  const currentSpeedRef = useRef(0);
-  const targetSpeedRef = useRef(1.2);
-  const maxSpeed = 1.5;
 
-  const [images, setImages] = useState<any[]>(NEWS_ITEMS);
+function NewsCarousel() {
+  const trackRef1 = useRef<HTMLDivElement>(null);
+  const trackRef2 = useRef<HTMLDivElement>(null);
+  const animRef = useRef<number | null>(null);
+  
+  const posRef1 = useRef(0);
+  const posRef2 = useRef(150); // Initial offset for "brick" effect
+  
+  const currentSpeedRef = useRef(0);
+  const targetSpeedRef = useRef(0.6);
+  const maxSpeed = 0.8;
+
+  const [images, setImages] = useState<any[]>(Array(8).fill(null));
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadRecuerdos() {
       const supabase = createClient();
-      const { data, error } = await supabase
-        .from("galeria")
-        .select("url")
-        .eq("categoria", "recuerdos")
-        .order("orden", { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from("galeria")
+          .select("url")
+          .eq("categoria", "recuerdos")
+          .order("orden", { ascending: true });
 
-      if (!error && data && data.length > 0) {
-        setImages(data.map(img => ({
-          src: img.url,
-          alt: "Recuerdo 12enpunto",
-          width: "w-[280px] md:w-[320px]",
-          label: "",
-          aspect: "aspect-square"
-        })));
+        if (!error && data && data.length > 0) {
+          setImages(data.map(img => ({
+            src: img.url,
+            alt: "Recuerdo 12enpunto",
+            width: "w-[240px] md:w-[300px]",
+            label: "",
+            aspect: "aspect-square"
+          })));
+        } else {
+          setImages(NEWS_ITEMS.map(item => ({ ...item, width: "w-[240px] md:w-[300px]" }))); 
+        }
+      } catch (err) {
+        console.error("Error loading recuerdos:", err);
+        setImages(NEWS_ITEMS.map(item => ({ ...item, width: "w-[240px] md:w-[300px]" })));
+      } finally {
+        setLoading(false);
       }
     }
     loadRecuerdos();
 
-    const track = trackRef.current;
-    if (!track) return;
     targetSpeedRef.current = maxSpeed;
     const animate = () => {
-      if (track) {
-        currentSpeedRef.current += (targetSpeedRef.current - currentSpeedRef.current) * 0.03;
-        posRef.current += currentSpeedRef.current;
-        const halfWidth = track.scrollWidth / 2;
-        if (posRef.current >= halfWidth) posRef.current = 0;
-        track.style.transform = `translateX(-${posRef.current}px)`;
+      currentSpeedRef.current += (targetSpeedRef.current - currentSpeedRef.current) * 0.03;
+      
+      // Track 1: Leftwards
+      if (trackRef1.current) {
+        posRef1.current += currentSpeedRef.current;
+        const halfWidth1 = trackRef1.current.scrollWidth / 2;
+        if (posRef1.current >= halfWidth1) posRef1.current = 0;
+        trackRef1.current.style.transform = `translateX(-${posRef1.current}px)`;
       }
+
+      // Track 2: Rightwards
+      if (trackRef2.current) {
+        posRef2.current -= currentSpeedRef.current;
+        const halfWidth2 = trackRef2.current.scrollWidth / 2;
+        if (posRef2.current <= -halfWidth2) posRef2.current = 0;
+        trackRef2.current.style.transform = `translateX(${posRef2.current}px)`;
+      }
+
       animRef.current = requestAnimationFrame(animate);
     };
     animRef.current = requestAnimationFrame(animate);
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, []);
 
+  if (!loading && images.length === 0) return null;
+
+  // Split images for two rows
+  const row1Images = images.slice(0, Math.ceil(images.length / 2));
+  const row2Images = images.slice(Math.ceil(images.length / 2));
+
+  const renderRow = (rowImages: any[], ref: React.RefObject<HTMLDivElement | null>, isReverse = false) => (
+    <div className="w-screen -mx-8 md:-mx-16 overflow-hidden">
+      <div ref={ref} className="flex gap-8 md:gap-12 items-center w-max px-[10vw] py-4">
+        {[...rowImages, ...rowImages, ...rowImages, ...rowImages].map((item, i) => {
+          const rotations = [2, -1.5, 1, -2.5, 1.8, -1, 2.2, -1.8, 1.2, -2];
+          const rot = rotations[i % rotations.length] * (isReverse ? -1 : 1);
+          return (
+            <div
+              key={i}
+              onMouseEnter={() => { if (!loading) targetSpeedRef.current = 0; }}
+              onMouseLeave={() => { if (!loading) targetSpeedRef.current = maxSpeed; }}
+              className={`flex-shrink-0 ${item?.width || "w-[240px] md:w-[300px]"} group cursor-pointer transition-transform duration-500`}
+              style={{ transform: `rotate(${rot}deg)`, transformOrigin: 'center center' }}
+            >
+              <div className={`relative ${item?.aspect || "aspect-square"} rounded-[2.5rem] overflow-hidden shadow-lg ${loading ? "bg-[#e8e3dd] animate-pulse" : ""}`}>
+                {!loading && item && (
+                  <Image src={item.src} alt={item.alt} fill draggable={false} className="object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none select-none" />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
-    <section className="w-full py-24 space-y-8 overflow-hidden px-8 md:px-16">
+    <section className="w-full py-24 space-y-12 overflow-hidden px-8 md:px-16">
       <BlurFadeIn className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-8">
         <div className="space-y-6 max-w-3xl">
           <span className="text-[#f15a24] text-[10px] font-bold tracking-[0.2em] uppercase">Creado con amor • desde 2001</span>
           <h2 className="text-[clamp(1.6rem,5vw,3rem)] font-bold font-[family-name:var(--font-fraunces)] leading-tight text-[#1a1a1a]">Sabores intensos, ingredientes locales, creado con amor</h2>
         </div>
       </BlurFadeIn>
-      <div className="w-screen -mx-8 md:-mx-16 overflow-hidden">
-        <div ref={trackRef} className="flex gap-12 items-center w-max px-[10vw] mt-6">
-          {[...images, ...images, ...images, ...images].map((item, i) => {
-            const rotations = [2, -1.5, 1, -2.5, 1.8, -1, 2.2, -1.8, 1.2, -2];
-            const rot = rotations[i % rotations.length];
-            return (
-              <div
-                key={i}
-                onMouseEnter={() => { targetSpeedRef.current = 0; }}
-                onMouseLeave={() => { targetSpeedRef.current = maxSpeed; }}
-                className={`flex-shrink-0 ${item.width} group cursor-pointer`}
-                style={{ transform: `rotate(${rot}deg)`, transformOrigin: 'center center' }}
-              >
-                <div className={`relative ${item.aspect} rounded-[2.5rem] overflow-hidden mb-6`}>
-                  <Image src={item.src} alt={item.alt} fill draggable={false} className="object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none select-none" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
+
+      <div className="flex flex-col gap-4 md:gap-8">
+        {renderRow(row1Images, trackRef1)}
+        {renderRow(row2Images.length > 0 ? row2Images : row1Images, trackRef2, true)}
       </div>
     </section>
   );
